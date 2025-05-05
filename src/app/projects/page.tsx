@@ -54,7 +54,7 @@ const Projects = () => {
 
     setIsRefreshing(true);
     animate(rotate, 1, {
-      duration: 0.6,
+      duration: 0.1,
       onComplete: () => {
         mutate("/api/projects", undefined, { revalidate: true });
         rotate.set(0);

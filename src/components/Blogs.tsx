@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { IoNewspaperOutline } from "react-icons/io5";
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import { MdEmail } from "react-icons/md";
-import { motion, useInView } from 'framer-motion';
+import { delay, motion, useInView } from 'framer-motion';
 import useSWR from 'swr';
 
 // Sample blog data to use instead of fetching
@@ -42,8 +42,8 @@ const Blogs = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.25,
-        delayChildren: 0.2,
+        staggerChildren: 0.2,
+        delayChildren: 1,
       },
     },
   };
