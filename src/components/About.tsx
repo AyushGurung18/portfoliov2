@@ -3,7 +3,7 @@ import Tooltip from '../components/Tooltip';
 
 const About = () => {
     return (
-        <section style={{ fontFamily: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }} className="p-4 text-left">
+        <section className="p-4 text-left">
             <div className="grid grid-cols-2 gap-4">
                 <div className="text-md text-[#869094] mb-4">
                     <h2 style={{ fontFamily: 'Ubuntu, sans-serif' }} className="text-2xl text-white font-semibold tracking-tighter">⚡About Me</h2>

@@ -38,7 +38,6 @@ export default function Home() {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          style={{ fontFamily: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           className="p-4 text-left py-8 lg:py-40"
         >
           <motion.p 

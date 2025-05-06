@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { IoNewspaperOutline } from "react-icons/io5";
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import { MdEmail } from "react-icons/md";
-import { delay, motion, useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import useSWR from 'swr';
 
 // Sample blog data to use instead of fetching

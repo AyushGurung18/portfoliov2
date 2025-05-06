@@ -1,8 +1,8 @@
 "use client";
 
 import useSWR, { mutate } from "swr";
-import { useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform ,animate } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import { FiRefreshCw } from "react-icons/fi";
@@ -25,7 +25,6 @@ type TechStack = {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-
 const LoadingSpinner = () => {
   return (
     <motion.div
@@ -38,16 +37,26 @@ const LoadingSpinner = () => {
 };
 
 const Projects = () => {
-  const { data, error, isLoading } = useSWR("/api/projects", fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnMount: false,
-    dedupingInterval: 1000 * 60 * 60 * 24, // 24 hours
-  });
-
+  // Add isMounted state to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Update SWR to include suspense: false
+  const { data, error, isLoading } = useSWR("/api/projects", fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnMount: true, // Changed to true for consistency
+    dedupingInterval: 1000 * 60 * 60 * 24, // 24 hours
+    suspense: false,
+  });
+
   const rotate = useMotionValue(0);
   const rotation = useTransform(rotate, [0, 1], [0, 360]);
+
+  // Set isMounted to true after component mounts
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleRefresh = () => {
     if (isRefreshing) return;
@@ -63,8 +72,9 @@ const Projects = () => {
     });
   };
 
-  const projects: Project[] = data?.projects || [];
-  const techStack: TechStack = data?.techStack || {};
+  // Safely access data only after mounting
+  const projects: Project[] = isMounted && data?.projects ? data.projects : [];
+  const techStack: TechStack = isMounted && data?.techStack ? data.techStack : {};
 
   const filteredProjects = projects.filter((project) =>
     project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,6 +83,11 @@ const Projects = () => {
       tech.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
+  // Return null during SSR to prevent hydration mismatch
+  if (!isMounted) {
+    return null;
+  }
 
   if (error) return <div className="text-red-500">Failed to load projects.</div>;
 

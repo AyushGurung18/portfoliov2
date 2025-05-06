@@ -9,6 +9,20 @@ export default {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			sans: [
+				'Inter',
+				'-apple-system',
+				'BlinkMacSystemFont',
+				'"Segoe UI"',
+				'Helvetica',
+				'Arial',
+				'sans-serif',
+				'"Apple Color Emoji"',
+				'"Segoe UI Emoji"',
+				'"Segoe UI Symbol"'
+			],
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
