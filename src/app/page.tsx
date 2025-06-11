@@ -44,7 +44,7 @@ export default function Home() {
             variants={itemVariants}
             className="lg:text-4xl text-2xl font-semibold tracking-tighter text-[#3CCF91] mb-2"
           >
-            Hey there!, I'm-
+            Hey there!, I&apos;m-
           </motion.p>
           
           <motion.h1 

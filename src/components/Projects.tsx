@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Types
 type TechStyle = {
@@ -124,7 +125,7 @@ const Projects = () => {
                   filter: isHovering && !isActive ? 'brightness(30%)' : 'brightness(100%)',
                   transition: 'filter 0.3s ease',
                 }}>
-                <img
+                <Image
                   src={project.image}
                   alt={project.title}
                   width={600} height={400}

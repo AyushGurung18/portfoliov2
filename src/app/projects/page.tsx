@@ -7,6 +7,7 @@ import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import { FiRefreshCw } from "react-icons/fi";
 import BeautifulError from "@/components/BeautifulError";
+import Image from "next/image";
 
 type Project = {
   title: string;
@@ -107,8 +108,8 @@ const Projects = () => {
         <h1 className="sm:text-7xl text-5xl  tracking-tighter font-bold">Projects</h1>
         <br />
         <p className="text-sm sm:text-base tracking-tighter">
-          I love building projects and practicing my engineering skills. Here's
-          an archive of things that I've worked on.
+          I love building projects and practicing my engineering skills. Here&apos;s
+          an archive of things that I&apos;ve worked on.
         </p>
           <div className="flex items-center mt-4 justify-between">
               <input
@@ -144,10 +145,11 @@ const Projects = () => {
                 className="bg-black pb-4 border border-[#1E2029] tracking-tighter rounded-lg shadow-lg flex flex-col h-full"
               >
                 <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <img
+                  <Image
                     src={project.image}
                     alt={project.title}
                     className="w-full h-auto object-cover rounded-lg mb-4"
+                    priority
                   />
                 </Link>
                 <div className="px-4 flex flex-col flex-grow">

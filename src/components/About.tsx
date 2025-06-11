@@ -11,7 +11,7 @@ const About = () => {
                     <h2 style={{ fontFamily: 'Ubuntu, sans-serif' }} className="text-2xl text-white font-semibold tracking-tighter">⚡About Me</h2>
                     <br />
                     <div className='tracking-tight text-sm sm:text-base'>
-                        Hey! I'm Ayush Gurung, I've been close to a computer since an early age, and been passionate about it ever since.
+                        Hey! I&apos;m Ayush Gurung, I&apos;ve been close to a computer since an early age, and been passionate about it ever since.
                         <br /><br />
                         <TooltipWrapper />
                     </div>    

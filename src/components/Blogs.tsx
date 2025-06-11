@@ -8,12 +8,19 @@ import { motion, useInView } from 'framer-motion';
 import useSWR from 'swr';
 import Link from 'next/link';
 
+// Type definition for blog data
+interface Blog {
+  id: string | number;
+  title: string;
+  summary: string;
+}
+
 // Sample blog data to use instead of fetching
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Blogs = () => {
 
-  const { data } = useSWR('/api/blogs', fetcher);
+  const { data }: { data?: Blog[] } = useSWR('/api/blogs', fetcher);
   const blogsRef = useRef(null);
   const contactRef = useRef(null);
   
@@ -85,7 +92,7 @@ const Blogs = () => {
               initial="hidden"
               animate={areBlogsInView ? "visible" : "hidden"}
             >
-              {data.map((blog: any) => (
+              {data.map((blog: Blog) => (
                 <Link key={blog.id} href={`/blogs/${blog.title.toLowerCase().replace(/\s+/g, '-')}`}>
                   <motion.div
                     variants={itemVariants}
@@ -110,7 +117,7 @@ const Blogs = () => {
             <motion.div variants={itemVariants} className="py-10 mt-5 sm:mt-20 flex flex-col text-center">
               <h1 className="sm:text-5xl text-4xl font-bold mb-10 mt-6">Keep in Touch</h1>
               <h3 className=" text-sm sm:text-base text-sm sm:mb-0 mb-4 text-[#869094]">
-                I'm currently specializing in <span className="text-[#3CCF91] hover:text-[#2ba577]">Full-stack Development</span>
+                I&apos;m currently specializing in <span className="text-[#3CCF91] hover:text-[#2ba577]">Full-stack Development</span>
               </h3>
               <h3 className=" text-sm sm:text-base text-sm text-[#869094]">
                 Feel free to get in touch and talk more about your projects.

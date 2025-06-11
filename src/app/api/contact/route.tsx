@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     
     // Send notification email to yourself (Ayush Gurung)
-    const { data: notificationData, error: notificationError } = await resend.emails.send({
+    const { error: notificationError } = await resend.emails.send({
       from: `Ayush Gurung <${fromEmail}>`,
       to: process.env.CONTACT_EMAIL || 'ayushgurung18sep@gmail.com',
       replyTo: email,
@@ -73,8 +73,6 @@ export async function POST(req: NextRequest) {
 
     // Optional: Send confirmation email to the user
     if (process.env.SEND_CONFIRMATION === 'true') {
-      const siteName = process.env.SITE_NAME || 'Ayush Gurung';
-      
       const { error: confirmationError } = await resend.emails.send({
         from: `Ayush Gurung <${fromEmail}>`, 
         to: email,

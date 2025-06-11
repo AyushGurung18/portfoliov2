@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FaGithub } from "react-icons/fa";
 import BeautifulError from "@/components/BeautifulError";
+import Image from "next/image";
 
 interface ContentSection {
   id: string;
@@ -78,7 +79,7 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
       if (!project) return;
       const offset = 120;
       const sectionElements = Object.entries(sectionRefs.current)
-        .filter(([_, el]) => el)
+        .filter(([, el]) => el)
         .map(([title, el]) => ({ title, el: el! }));
 
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 20) {
@@ -219,11 +220,15 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
         </Link>
         
         {/* Full-width Hero Image */}
-        <img
-          src={project.image}
-          alt={project.title}
-          className="w-full rounded-xl mb-10 shadow-xl"
-        />
+        <Image 
+                  src={project.image} 
+                  alt={project.title} 
+                  width={1200}
+                  height={600}
+                  className="w-full rounded-xl mb-10 shadow-xl"
+                  priority
+                />
+        
 
         {/* Title */}
         <h1 className="sm:text-4xl text-3xl my-3 font-extrabold flex items-center gap-3">

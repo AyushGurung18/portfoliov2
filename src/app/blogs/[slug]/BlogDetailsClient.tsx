@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { TextareaForm } from '@/components/CommentBox';
 import Link from 'next/link';
+import Image from 'next/image';
 import clsx from 'clsx';
 import { Skeleton } from '@/components/ui/skeleton';
 import BeautifulError from '@/components/BeautifulError';
@@ -74,7 +75,7 @@ export default function BlogDetailsPage({ initialData, slug }: Props) {
     const handleScroll = () => {
       if (!blog) return;
       const sectionElements = Object.entries(sectionRefs.current)
-        .filter(([_, el]) => el)
+        .filter(([, el]) => el) // Fixed: removed unused parameter '_'
         .map(([title, el]) => ({ title, el: el! }));
 
       const sorted = sectionElements.sort(
@@ -178,7 +179,14 @@ export default function BlogDetailsPage({ initialData, slug }: Props) {
           ← Back to Blogs
         </Link>
 
-        <img src={blog.image} alt={blog.title} className="w-full rounded-xl mb-10 shadow-xl" />
+        <Image 
+          src={blog.image} 
+          alt={blog.title} 
+          width={1200}
+          height={600}
+          className="w-full rounded-xl mb-10 shadow-xl"
+          priority
+        />
 
         <h1 className="text-4xl my-3 font-extrabold flex items-center gap-3">
           {blog.title}
