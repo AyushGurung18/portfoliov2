@@ -2,6 +2,7 @@ import { Inter } from 'next/font/google';
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { GoogleAnalytics } from '@next/third-parties/google'; // ✅ Add this
 
 const inter = Inter({
   subsets: ['latin'],
@@ -11,7 +12,8 @@ const inter = Inter({
 
 export const metadata = {
   title: "Ayush Gurung - Software Engineer",
-  description: "I'm a Software engineer specializing in full-stack web development, AI, and building modern, scalable applications. View my portfolio and projects.",
+  description:
+    "I'm a Software engineer specializing in full-stack web development, AI, and building modern, scalable applications. View my portfolio and projects.",
 };
 
 export default function RootLayout({
@@ -24,13 +26,13 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/images/icon.ico" />
       </head>
-      <body
-        className={`${inter.variable} antialiased bg-black text-gray-100`}
-      >
+      <body className={`${inter.variable} antialiased bg-black text-gray-100`}>
         <Header />
         <main className="p-4">{children}</main>
         <Footer />
       </body>
+
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
     </html>
   );
 }

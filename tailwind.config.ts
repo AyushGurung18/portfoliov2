@@ -8,6 +8,21 @@ export default {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+	screens: {
+		sm: "640px",
+		md: "768px",
+		lg: "1024px",
+		xl: "1280px",
+		"2xl": "1536px",
+		"3xl": "1600px",
+		"4xl": "1920px",
+		"5xl": "2560px",
+		"6xl": "3840px",
+		"7xl": "5120px",
+		"8xl": "7680px",
+		"9xl": "10240px",
+		'custom': '768px',
+	},
   	extend: {
 		fontFamily: {
 			sans: [

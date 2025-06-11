@@ -1,31 +1,31 @@
-"use client";
+// components/Tooltip.tsx
+
+'use client';
 
 import { useState } from 'react';
-import "../app/globals.css";
 
 interface TooltipProps {
-  text: string;
-  tooltipText: string;
+    text: string;
+    tooltipText: string;
 }
 
-const Tooltip = ({ text, tooltipText }: TooltipProps) => {
-  const [showTooltip, setShowTooltip] = useState(false);
+const Tooltip: React.FC<TooltipProps> = ({ text, tooltipText }) => {
+    const [show, setShow] = useState(false);
 
-  return (
-    <div
-      className="relative inline-block"
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      <div className="text-[#3CCF91]">{text}</div>
-      {showTooltip && (
-        <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-4 py-2 bg-black text-white border border-[#3CCF91] rounded w-auto whitespace-nowrap z-50">
-          {tooltipText}
-          <div className="absolute top-1/2 left-0 transform -translate-x-full -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-r-4 border-r-[#3CCF91] border-b-4 border-b-transparent"></div>
-        </div>
-      )}
-    </div>
-  );
+    return (
+        <span
+            onMouseEnter={() => setShow(true)}
+            onMouseLeave={() => setShow(false)}
+            className="relative cursor-help text-[#3CCF91] hover:text-[#3CCF91] transition-colors duration-200"
+        >
+            {text}
+            {show && (
+                <div className="absolute left-0 z-10 mt-2 w-60 p-2 bg-gray-800 text-white text-xs rounded shadow-lg hidden md:block">
+                    {tooltipText}
+                </div>
+            )}
+        </span>
+    );
 };
 
 export default Tooltip;

@@ -62,7 +62,7 @@ const Projects = () => {
 
   return (
     <section
-      className="relative max-w-[1200px] tracking-tighter mx-auto px-8 py-20"
+      className="relative max-w-[1200px] tracking-tighter mx-auto px-8 py-20 overflow-x-hidden"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => {
         setIsHovering(false);
@@ -86,13 +86,13 @@ const Projects = () => {
         transition={{ duration: 0.8, delay: 0.2 }}
         className="mb-20 relative z-20"
       >
-        <h2 className="text-2xl font-bold mb-4">All Creative Works.</h2>
-        <p className="text-xl text-[#869094] mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">All Creative Works.</h2>
+        <p className="lg:text-xl text-lg text-[#869094] mb-6">
           Here's some of my projects that I have worked on.
         </p>
         <Link
           href="/projects"
-          className="text-xl text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center"
+          className="lg:text-base text-xs text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center"
         >
           Explore more →
         </Link>
@@ -116,7 +116,7 @@ const Projects = () => {
               variants={itemVariants}
               className={`group flex flex-col ${
                 isRight ? 'md:flex-row-reverse' : 'md:flex-row'
-              } gap-12 -mt-[222px] items-center`}
+              } gap-12 mt-0 sm:mt-0 md:-mt-[192px] lg:-mt-[222px] items-center`}
             >
               <div className="w-full md:w-1/2 bg-[#080808] border border-[#1E2029] rounded-3xl" 
                 onMouseEnter={() => setActiveIndex(index)}
@@ -132,7 +132,7 @@ const Projects = () => {
                   style={{ borderRadius: '25px 25px 0px 0px' }}
                 />
                 <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-4">{project.title}</h3>
+                  <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}><h3 className="text-xl sm:text-2xl font-bold mb-4">{project.title}</h3></Link>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.map((tech, techIndex) => {
                       const techInfo = techStack[tech] || {
@@ -156,7 +156,7 @@ const Projects = () => {
                       );
                     })}
                   </div>
-                  <p className="text-[#869094] mb-6 line-clamp-2">{project.description}</p>
+                  <p className="text-[#869094] tracking-tight text-sm sm:text-base mb-6 line-clamp-2">{project.description}</p>
                 </div>
               </div>
               <div className="md:w-1/2"></div>
