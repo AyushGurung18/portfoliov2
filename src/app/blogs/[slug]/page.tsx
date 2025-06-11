@@ -4,13 +4,14 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export const revalidate = 1296000
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const blog = await getBlogDetailsBySlug(params.slug);
+  const { slug } = await params;
+  const blog = await getBlogDetailsBySlug(slug);
   if (!blog) return { title: 'Not Found' };
 
   return {
@@ -21,9 +22,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const blog = await getBlogDetailsBySlug(params.slug);
+  const { slug } = await params;
+  const blog = await getBlogDetailsBySlug(slug);
 
   if (!blog) return notFound();
 
-  return <BlogDetailsPage initialData={blog} slug={params.slug} />;
+  return <BlogDetailsPage initialData={blog} slug={slug} />;
 }

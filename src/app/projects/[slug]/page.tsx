@@ -5,13 +5,14 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export const revalidate = 1296000;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const project = await getProjectDetailsBySlug(params.slug);
+  const { slug } = await params;
+  const project = await getProjectDetailsBySlug(slug);
   if (!project) return { title: 'Not Found' };
 
   return {
@@ -22,8 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const project = await getProjectDetailsBySlug(params.slug);
+  const { slug } = await params;
+  const project = await getProjectDetailsBySlug(slug);
   if (!project) return notFound();
 
-  return <ProjectDetailsPage initialData={project} slug={params.slug} />;
+  return <ProjectDetailsPage initialData={project} slug={slug} />;
 }
