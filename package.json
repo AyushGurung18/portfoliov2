@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "overrides": {
+    "magic-ui": {
+      "odbc": false
+    }
+  },
   "dependencies": {
     "@deemlol/next-icons": "^0.1.9",
     "@hookform/resolvers": "^5.0.1",
