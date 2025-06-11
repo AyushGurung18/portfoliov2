@@ -58,7 +58,7 @@ import {
             <Section style={header}>
               <Heading style={heading}>Message Received</Heading>
               <Text style={subheading}>
-                Hi {name}, thank you for reaching out! I've received your message and will get back to you soon.
+                Hi {name}, thank you for reaching out! I&apos;ve received your message and will get back to you soon.
               </Text>
             </Section>
             <Hr style={hr} />

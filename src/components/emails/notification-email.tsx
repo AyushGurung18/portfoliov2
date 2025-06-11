@@ -42,7 +42,7 @@ import {
             <Section style={header}>
               <Heading style={heading}>New Contact Message</Heading>
               <Text style={subheading}>
-                You've received a new message from your website contact form
+                You&apos;ve received a new message from your website contact form
               </Text>
             </Section>
             <Hr style={hr} />

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
-import { FaGithub } from 'react-icons/fa';
 
 // Types
 type TechStyle = {
@@ -88,7 +87,7 @@ const Projects = () => {
       >
         <h2 className="text-xl sm:text-2xl font-bold mb-4">All Creative Works.</h2>
         <p className="lg:text-xl text-lg text-[#869094] mb-6">
-          Here's some of my projects that I have worked on.
+          Here&apos;s some of my projects that I have worked on.
         </p>
         <Link
           href="/projects"
@@ -128,6 +127,7 @@ const Projects = () => {
                 <img
                   src={project.image}
                   alt={project.title}
+                  width={600} height={400}
                   className="w-full object-cover rounded-lg shadow-lg"
                   style={{ borderRadius: '25px 25px 0px 0px' }}
                 />

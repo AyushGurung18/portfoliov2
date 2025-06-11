@@ -138,7 +138,7 @@ const Contact: React.FC<ContactProps> = ({ isOpen, onClose }) => {
               >
                 <div className="backdrop-blur-md">
                   <h2 className="text-2xl text-center font-semibold mb-4">
-                    Let's <AuroraText>Connect</AuroraText>
+                    Let&apos;s <AuroraText>Connect</AuroraText>
                   </h2>
                   {submissionStatus && (
                     <div
