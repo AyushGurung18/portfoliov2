@@ -131,6 +131,7 @@ const Projects = () => {
                   width={600} height={400}
                   className="w-full object-cover rounded-lg shadow-lg"
                   style={{ borderRadius: '25px 25px 0px 0px' }}
+                  priority
                 />
                 <div className="p-6">
                   <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}><h3 className="text-xl sm:text-2xl font-bold mb-4">{project.title}</h3></Link>
