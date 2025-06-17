@@ -2,7 +2,13 @@
 
 import useSWR, { mutate } from "swr";
 import { useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  animate,
+} from "framer-motion";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import { FiRefreshCw } from "react-icons/fi";
@@ -42,11 +48,11 @@ const Projects = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  
   const { data, error, isLoading } = useSWR("/api/projects", fetcher, {
     revalidateOnFocus: false,
     revalidateOnMount: true,
     dedupingInterval: 1000 * 60 * 60 * 24,
+    suspense: false,
   });
 
   const rotate = useMotionValue(0);
@@ -59,7 +65,7 @@ const Projects = () => {
     animate(rotate, 1, {
       duration: 0.1,
       onComplete: () => {
-        mutate("/api/blogs", undefined, { revalidate: true });
+        mutate("/api/projects", undefined, { revalidate: true });
         rotate.set(0);
         setIsRefreshing(false);
       },
@@ -105,93 +111,93 @@ const Projects = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="py-12 my-12 mb-8">
-        <h1 className="sm:text-7xl text-5xl  tracking-tighter font-bold">Projects</h1>
+        <h1 className="sm:text-7xl text-5xl tracking-tighter font-bold">Projects</h1>
         <br />
         <p className="text-sm sm:text-base tracking-tighter">
-          I love building projects and practicing my engineering skills. Here&apos;s
-          an archive of things that I&apos;ve worked on.
+          I love building projects and practicing my engineering skills. Here&apos;s an archive of things that I&apos;ve worked on.
         </p>
-          <div className="flex items-center mt-4 justify-between">
-              <input
-                type="text"
-                placeholder="Search Projects"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="p-2 bg-[#1E2029] w-96 text-white border border-[#3CCF91] rounded"
-              />
-              <motion.div
-                className="ms-8 flex justify-end"
-                style={{ rotate: rotation }}
-              >
-                <FiRefreshCw
-                  className="cursor-pointer text-[#3CCF91] hover:text-[#2ba577] transition-colors"
-                  size={20}
-                  onClick={handleRefresh}
-                />
-              </motion.div>
-          </div>
+        <div className="flex items-center mt-4 justify-between">
+          <input
+            type="text"
+            placeholder="Search Projects"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="p-2 bg-[#1E2029] w-96 text-white border border-[#3CCF91] rounded"
+          />
+          <motion.div className="ms-8 flex justify-end" style={{ rotate: rotation }}>
+            <FiRefreshCw
+              className="cursor-pointer text-[#3CCF91] hover:text-[#2ba577] transition-colors"
+              size={20}
+              onClick={handleRefresh}
+            />
+          </motion.div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <AnimatePresence>
           {filteredProjects.length > 0 ? (
-            filteredProjects.map((project, index) => (
-              <motion.div
-                key={`${project.title}-${index}`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 30 }}
-                transition={{ delay: index * 0.1, duration: 1 }}
-                className="bg-black pb-4 border border-[#1E2029] tracking-tighter rounded-lg shadow-lg flex flex-col h-full"
-              >
-                <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-auto object-cover rounded-lg mb-4"
-                    priority
-                  />
-                </Link>
-                <div className="px-4 flex flex-col flex-grow">
-                  <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-white">{project.title}</h3>
-                  </Link>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.map((tech, techIndex) => {
-                      const techInfo = techStack[tech];
-                      if (!techInfo) return null;
-                      return (
-                        <span
-                          key={techIndex}
-                          className="px-3 py-1 text-sm rounded-full flex items-center gap-1"
-                          style={{
-                            backgroundColor: `${techInfo.color}15`,
-                            color: techInfo.text_color,
-                            border: `1px solid ${techInfo.color}`,
-                          }}
-                        >
-                          <i className={`icon-${techInfo.icon} text-base`}></i>
-                          {tech}
-                        </span>
-                      );
-                    })}
-                  </div>
-                  <hr className="border-t border-[#1E2029] mb-4" />
-                  <div className="flex flex-col flex-grow">
-                    <p className="text-[#869094] text-sm sm:text-base">{project.description}</p>
-                    <div className="mt-auto pt-4">
-                      <Link
-                        href={project.github || "https://github.com/default"}
-                        className="inline-flex space-x-2 w-auto px-6 py-2 text-base font-semibold text-white bg-[#141414] rounded hover:bg-[#292929] cursor-pointer"
-                      >
-                        <FaGithub size={20} />
-                        <span>View Source</span>
-                      </Link>
+            filteredProjects.map((project, index) => {
+              const slug = project.title.toLowerCase().replace(/\s+/g, "-");
+              return (
+                <Link key={`${project.title}-${index}`} href={`/projects/${slug}`} prefetch>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 30 }}
+                    transition={{ delay: index * 0.1, duration: 1 }}
+                    className="bg-black pb-4 border border-[#1E2029] tracking-tighter rounded-lg shadow-lg flex flex-col h-full cursor-pointer"
+                  >
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-auto object-cover rounded-lg mb-4"
+                      width={600}
+                      height={400}
+                      priority={index === 0}
+                    />
+                    <div className="px-4 flex flex-col flex-grow">
+                      <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-white">{project.title}</h3>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {project.technologies.map((tech, techIndex) => {
+                          const techInfo = techStack[tech];
+                          if (!techInfo) return null;
+                          return (
+                            <span
+                              key={techIndex}
+                              className="px-3 py-1 text-sm rounded-full flex items-center gap-1"
+                              style={{
+                                backgroundColor: `${techInfo.color}15`,
+                                color: techInfo.text_color,
+                                border: `1px solid ${techInfo.color}`,
+                              }}
+                            >
+                              <i className={`icon-${techInfo.icon} text-base`}></i>
+                              {tech}
+                            </span>
+                          );
+                        })}
+                      </div>
+                      <hr className="border-t border-[#1E2029] mb-4" />
+                      <div className="flex flex-col flex-grow">
+                        <p className="text-[#869094] text-sm sm:text-base">{project.description}</p>
+                        <div className="mt-auto pt-4">
+                          <a
+                            href={project.github || "https://github.com/default"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex space-x-2 w-auto px-6 py-2 text-base font-semibold text-white bg-[#141414] rounded hover:bg-[#292929] cursor-pointer"
+                          >
+                            <FaGithub size={20} />
+                            <span>View Source</span>
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))
+                  </motion.div>
+                </Link>
+              );
+            })
           ) : (
             <div className="col-span-full text-center py-12 text-[#7f8b97]">
               {searchTerm ? "No projects found matching your search." : "No projects available."}
