@@ -1,10 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import useSWR from 'swr';
 
 // Types
 type TechStyle = {
@@ -25,15 +24,21 @@ type Project = {
   github: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 const Projects = () => {
-  const { data } = useSWR('/api/projects', fetcher);
-  const projects: Project[] = data?.projects || [];
-  const techStack: TechStack = data?.techStack || {};
-  
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [techStack, setTechStack] = useState<TechStack>({});
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const res = await fetch('/api/projects');
+      const data = await res.json();
+      setProjects(data.projects);
+      setTechStack(data.techStack);
+    };
+    fetchProjects();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -54,11 +59,6 @@ const Projects = () => {
       transition: { duration: 1, ease: 'easeOut' },
     },
   };
-
-  // Show nothing if no projects loaded yet - keeps page smooth
-  if (!projects.length) {
-    return null;
-  }
 
   return (
     <section
