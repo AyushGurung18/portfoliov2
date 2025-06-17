@@ -1,10 +1,10 @@
 'use client';
 
-import useSWR from 'swr';
 import { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
+import useSWR from 'swr';
 
 // Types
 type TechStyle = {
@@ -25,27 +25,23 @@ type Project = {
   github: string;
 };
 
-// Fetcher for SWR
-const fetcher = (url: string) => fetch(url).then(res => {
-  if (!res.ok) throw new Error('Failed to fetch');
-  return res.json();
-});
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Projects = () => {
-  const { data, error, isLoading } = useSWR('/api/projects', fetcher, {
-    revalidateOnFocus: false,
-  });
-
+  const { data, error, isLoading } = useSWR('/api/projects', fetcher);
+  const projects: Project[] = data?.projects || [];
+  const techStack: TechStack = data?.techStack || {};
+  
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
-
-  const ref = useRef(null);
-  const isInView = useInView(ref, { margin: '-100px 0px', once: true });
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.5 } },
   };
+
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: '-100px 0px', once: true });
 
   const itemVariants = {
     hidden: (isRight: boolean) => ({
@@ -59,25 +55,6 @@ const Projects = () => {
     },
   };
 
-  if (isLoading) {
-    return (
-      <section className="text-white px-8 py-20 text-center">
-        <p className="text-[#3CCF91] text-lg">Loading projects...</p>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="text-white px-8 py-20 text-center">
-        <p className="text-red-500 text-lg">Error loading projects.</p>
-      </section>
-    );
-  }
-
-  const projects = data?.projects || [];
-  const techStack: TechStack = data?.techStack || {};
-
   return (
     <section
       className="relative max-w-[1200px] tracking-tighter mx-auto px-8 py-20 overflow-x-hidden"
@@ -87,6 +64,7 @@ const Projects = () => {
         setActiveIndex(null);
       }}
     >
+      {/* Dark overlay on entire section */}
       {isHovering && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -122,41 +100,36 @@ const Projects = () => {
         animate={isInView ? 'visible' : 'hidden'}
         className="relative z-20"
       >
-        {projects.map((project: Project, index: number) => {
+        {projects.map((project, index) => {
           const isRight = index % 2 === 0;
           const isActive = activeIndex === index;
 
           return (
             <motion.div
-              key={project.title + index}
+              key={index}
               custom={isRight}
               variants={itemVariants}
               className={`group flex flex-col ${
                 isRight ? 'md:flex-row-reverse' : 'md:flex-row'
               } gap-12 mt-0 sm:mt-0 md:-mt-[192px] lg:-mt-[222px] items-center`}
             >
-              <div
-                className="w-full md:w-1/2 bg-[#080808] border border-[#1E2029] rounded-3xl"
+              <div className="w-full md:w-1/2 bg-[#080808] border border-[#1E2029] rounded-3xl" 
                 onMouseEnter={() => setActiveIndex(index)}
                 onMouseLeave={() => setActiveIndex(null)}
                 style={{
                   filter: isHovering && !isActive ? 'brightness(30%)' : 'brightness(100%)',
                   transition: 'filter 0.3s ease',
-                }}
-              >
+                }}>
                 <Image
                   src={project.image}
                   alt={project.title}
-                  width={600}
-                  height={400}
+                  width={600} height={400}
                   className="w-full object-cover rounded-lg shadow-lg"
                   style={{ borderRadius: '25px 25px 0px 0px' }}
                   priority
                 />
                 <div className="p-6">
-                  <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <h3 className="text-xl sm:text-2xl font-bold mb-4">{project.title}</h3>
-                  </Link>
+                  <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}><h3 className="text-xl sm:text-2xl font-bold mb-4">{project.title}</h3></Link>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.map((tech, techIndex) => {
                       const techInfo = techStack[tech] || {
@@ -180,12 +153,10 @@ const Projects = () => {
                       );
                     })}
                   </div>
-                  <p className="text-[#869094] tracking-tight text-sm sm:text-base mb-6 line-clamp-2">
-                    {project.description}
-                  </p>
+                  <p className="text-[#869094] tracking-tight text-sm sm:text-base mb-6 line-clamp-2">{project.description}</p>
                 </div>
               </div>
-              <div className="md:w-1/2" />
+              <div className="md:w-1/2"></div>
             </motion.div>
           );
         })}
