@@ -28,7 +28,7 @@ type Project = {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Projects = () => {
-  const { data, error, isLoading } = useSWR('/api/projects', fetcher);
+  const { data } = useSWR('/api/projects', fetcher);
   const projects: Project[] = data?.projects || [];
   const techStack: TechStack = data?.techStack || {};
   
@@ -54,6 +54,11 @@ const Projects = () => {
       transition: { duration: 1, ease: 'easeOut' },
     },
   };
+
+  // Show nothing if no projects loaded yet - keeps page smooth
+  if (!projects.length) {
+    return null;
+  }
 
   return (
     <section
