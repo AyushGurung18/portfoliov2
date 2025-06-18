@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "https://www.ayushgurung.com",
+      "destination": "https://ayushgurung.com",
+      "permanent": true
+    }
+  ]
+}
