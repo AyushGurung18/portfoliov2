@@ -7,18 +7,21 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// Longer revalidation period for better performance
+// ISR revalidation - 15 days for constant data
 export const revalidate = 1296000; // 15 days
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const project = await getProjectDetailsBySlug(slug);
-  if (!project) return { title: 'Not Found' };
+  
+  if (!project) {
+    return { title: 'Not Found' };
+  }
 
   return {
     title: project.title,
     description: project.description,
-    openGraph: { 
+    openGraph: {
       images: [project.image],
       title: project.title,
       description: project.description,
@@ -29,7 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { slug } = await params;
   const project = await getProjectDetailsBySlug(slug);
-  if (!project) return notFound();
+  
+  if (!project) {
+    return notFound();
+  }
 
-  return <ProjectDetailsPage initialData={project} slug={slug} />;
+  // Updated to match the new component props (project instead of initialData)
+  return <ProjectDetailsPage project={project} slug={slug} />;
 }
