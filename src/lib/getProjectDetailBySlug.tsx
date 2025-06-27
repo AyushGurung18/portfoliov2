@@ -1,4 +1,3 @@
-// lib/getProjectDetailsBySlug.ts
 import { supabase } from "@/lib/supabaseClient";
 
 export async function getProjectDetailsBySlug(slug: string) {
@@ -23,7 +22,9 @@ export async function getProjectDetailsBySlug(slug: string) {
     .limit(1)
     .single();
 
-  if (error || !data || !data.project_details) return null;
+  if (error || !data || !data.project_details) {
+    return null;
+  }
 
   const detail = Array.isArray(data.project_details)
     ? data.project_details[0]
@@ -34,7 +35,7 @@ export async function getProjectDetailsBySlug(slug: string) {
     description: data.description,
     image: data.image,
     project_id: slug,
-    content_sections: detail.content_sections,
+    content_sections: detail.content_sections || [],
     project_url: detail.project_url,
     technologies: data.technologies || [],
     github: data.github || "",

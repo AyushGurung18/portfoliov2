@@ -1,20 +1,35 @@
-import { NextResponse } from "next/server";
-import { getProjectDetailsBySlug } from "@/lib/getProjectDetailBySlug";
+import ProjectDetailsPage from '../../projects/[slug]/ProjectDetailsClient';
+import { getProjectDetailsBySlug } from '@/lib/getProjectDetailBySlug';
+import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const slug = url.searchParams.get("slug");
+interface Props {
+  params: Promise<{ slug: string }>;
+}
 
-  if (!slug) {
-    return NextResponse.json({ error: "Missing slug" }, { status: 400 });
-  }
+// Longer revalidation period for better performance
+export const revalidate = 1296000; // 15 days
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const project = await getProjectDetailsBySlug(slug);
-  if (!project) {
-    return NextResponse.json({ error: `Project "${slug}" not found` }, { status: 404 });
-  }
+  if (!project) return { title: 'Not Found' };
 
-  const response = NextResponse.json({ project });
-  response.headers.set('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
-  return response;
+  return {
+    title: project.title,
+    description: project.description,
+    openGraph: { 
+      images: [project.image],
+      title: project.title,
+      description: project.description,
+    },
+  };
+}
+
+export default async function Page({ params }: Props) {
+  const { slug } = await params;
+  const project = await getProjectDetailsBySlug(slug);
+  if (!project) return notFound();
+
+  return <ProjectDetailsPage initialData={project} slug={slug} />;
 }
