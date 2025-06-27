@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { TextareaForm } from "@/components/CommentBox";
 import { useEffect, useState, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,13 +33,15 @@ interface Props {
   slug: string;
 }
 
-export default function ProjectDetailsPage ({initialData , slug } : Props) {
+export default function ProjectDetailsPage({ initialData, slug }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
   const projectId = pathname?.split("/").pop() || "";
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [activeSection, setActiveSection] = useState<string>("");
+  const [isNavigating, setIsNavigating] = useState(false);
 
-    const fetcher = (url: string) =>
+  const fetcher = (url: string) =>
     fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch project');
@@ -52,15 +54,40 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
     fetcher,
     {
       fallbackData: initialData,
-      revalidateOnMount: true,
+      revalidateOnMount: false, // Changed from true to false
       revalidateOnFocus: false,
       refreshInterval: 5 * 60 * 1000,
       dedupingInterval: 2000,
+      // Add these for better performance
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
     }
   );
 
   const handleRetry = () => {
     mutate();
+  };
+
+  // Enhanced back navigation with immediate feedback
+  const handleBackNavigation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsNavigating(true);
+    
+    // Add immediate visual feedback
+    document.body.style.cursor = 'wait';
+    
+    // Use router.back() if possible, otherwise navigate to projects
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push('/projects');
+    }
+    
+    // Reset cursor after a short delay
+    setTimeout(() => {
+      document.body.style.cursor = 'default';
+      setIsNavigating(false);
+    }, 500);
   };
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -116,7 +143,8 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
       : <div className="text-white-300 whitespace-pre-line">{content}</div>;
   };
 
-  if (isLoading) return (
+  // Show loading state only when there's no initial data
+  if (isLoading && !initialData) return (
     <div className="min-h-screen bg-black text-white px-6 md:px-20 py-12">
       {/* Back button skeleton */}
       <div className="mb-8">
@@ -199,8 +227,11 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
     );
   }
 
-  // Early return if project is null (shouldn't happen after loading, but good safety check)
-  if (!project) {
+  // Use initialData if available, otherwise use SWR data
+  const currentProject = project || initialData;
+
+  // Early return if no project data is available
+  if (!currentProject) {
     return (
       <BeautifulError 
         error="Project data not available"
@@ -212,34 +243,44 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 md:px-20 py-12 relative">
-      {/* Back button */}
+    <div className={clsx(
+      "min-h-screen bg-black text-white px-6 md:px-20 py-12 relative transition-opacity duration-300",
+      isNavigating && "opacity-50"
+    )}>
+      {/* Back button with enhanced interaction */}
       <div className="border-b border-[#1E2029] pb-8">
-        <Link href="/projects" className="text-blue-400 hover:underline mb-8 inline-block">
+        <button
+          onClick={handleBackNavigation}
+          className={clsx(
+            "text-blue-400 hover:text-blue-300 mb-8 inline-block transition-all duration-200",
+            "hover:translate-x-[-4px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 rounded px-2 py-1",
+            isNavigating && "opacity-50 cursor-wait"
+          )}
+          disabled={isNavigating}
+        >
           ← Back to Projects
-        </Link>
+        </button>
         
         {/* Full-width Hero Image */}
         <Image 
-                  src={project.image} 
-                  alt={project.title} 
-                  width={1200}
-                  height={600}
-                  className="w-full rounded-xl mb-10 shadow-xl"
-                  priority
-                />
+          src={currentProject.image} 
+          alt={currentProject.title} 
+          width={1200}
+          height={600}
+          className="w-full rounded-xl mb-10 shadow-xl"
+          priority
+        />
         
-
         {/* Title */}
         <h1 className="sm:text-4xl text-3xl my-3 font-extrabold flex items-center gap-3">
-          {project.title}
+          {currentProject.title}
         </h1>
 
-        <p className="my-2 text-sm sm:text-base text-gray-400">{project.description}</p>
+        <p className="my-2 text-sm sm:text-base text-gray-400">{currentProject.description}</p>
         <Link
-          href={project.project_url}
+          href={currentProject.project_url}
           target="_blank"
-          className="flex items-center text-green-400 text-sm sm:text-base"
+          className="flex items-center text-green-400 text-sm sm:text-base hover:text-green-300 transition-colors"
         >
           <FaGithub className="mr-2" /> Live Site
         </Link>
@@ -249,7 +290,7 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
       <div className="flex flex-col md:flex-row gap-12 mt-10">
         {/* Main Content */}
         <div className="flex-1">
-          {project.content_sections?.map((section, index) => {
+          {currentProject.content_sections?.map((section, index) => {
             return (
               <section
                 key={index}
@@ -273,7 +314,7 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
         <aside className="w-full md:w-64 flex-shrink-0 sticky top-32 self-start hidden md:block">
           <h3 className="text-xl font-bold mb-4">Table of Contents</h3>
           <ul className="space-y-2">
-            {project.content_sections?.map((section, index) => {
+            {currentProject.content_sections?.map((section, index) => {
               return (
                 <li key={index}>
                   <a
@@ -301,4 +342,4 @@ export default function ProjectDetailsPage ({initialData , slug } : Props) {
       </div>
     </div>
   );
-};
+}
