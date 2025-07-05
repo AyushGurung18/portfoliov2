@@ -1,42 +1,36 @@
-import ProjectDetailsPage from '../../projects/[slug]/ProjectDetailsClient';
-import { getProjectDetailsBySlug } from '@/lib/getProjectDetailBySlug';
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+import { NextResponse } from "next/server";
+import { getProjectDetailsBySlug } from "@/lib/getProjectDetailBySlug";
 
-interface Props {
-  params: Promise<{ slug: string }>;
-}
+export async function GET(request: Request) {
+  try {
+    const url = new URL(request.url);
+    const slug = url.searchParams.get("slug");
 
-// ISR revalidation - 15 days for constant data
-export const revalidate = 1296000; // 15 days
+    if (!slug) {
+      return NextResponse.json({ 
+        error: "Missing slug parameter",
+        errorType: "bad_request"
+      }, { status: 400 });
+    }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const project = await getProjectDetailsBySlug(slug);
-  
-  if (!project) {
-    return { title: 'Not Found' };
+    const project = await getProjectDetailsBySlug(slug);
+    
+    if (!project) {
+      return NextResponse.json({ 
+        error: `Project "${slug}" not found`,
+        errorType: "not_found",
+        slug: slug
+      }, { status: 404 });
+    }
+
+    const response = NextResponse.json({ project: [project] });
+    response.headers.set('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+    return response;
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json({ 
+      error: "Internal server error",
+      errorType: "server_error"
+    }, { status: 500 });
   }
-
-  return {
-    title: project.title,
-    description: project.description,
-    openGraph: {
-      images: [project.image],
-      title: project.title,
-      description: project.description,
-    },
-  };
-}
-
-export default async function Page({ params }: Props) {
-  const { slug } = await params;
-  const project = await getProjectDetailsBySlug(slug);
-  
-  if (!project) {
-    return notFound();
-  }
-
-  // Updated to match the new component props (project instead of initialData)
-  return <ProjectDetailsPage project={project} slug={slug} />;
 }

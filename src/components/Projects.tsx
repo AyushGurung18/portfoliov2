@@ -17,6 +17,7 @@ type TechStack = {
 };
 
 type Project = {
+  id: number;
   title: string;
   description: string;
   image: string;
@@ -58,6 +59,14 @@ const Projects = () => {
       opacity: 1,
       transition: { duration: 1, ease: 'easeOut' },
     },
+  };
+
+  // Helper function to generate clean slug from title
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   };
 
   return (
@@ -108,6 +117,7 @@ const Projects = () => {
         {projects.map((project, index) => {
           const isRight = index % 2 === 0;
           const isActive = activeIndex === index;
+          const projectSlug = generateSlug(project.title);
 
           return (
             <motion.div
@@ -134,7 +144,11 @@ const Projects = () => {
                   priority
                 />
                 <div className="p-6">
-                  <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}><h3 className="text-xl sm:text-2xl font-bold mb-4">{project.title}</h3></Link>
+                  <Link href={`/projects/${projectSlug}`}>
+                    <h3 className="text-xl sm:text-2xl font-bold mb-4 hover:text-[#3CCF91] transition-colors cursor-pointer">
+                      {project.title}
+                    </h3>
+                  </Link>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.map((tech, techIndex) => {
                       const techInfo = techStack[tech] || {

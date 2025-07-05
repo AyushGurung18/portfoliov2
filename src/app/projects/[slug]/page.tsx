@@ -1,3 +1,4 @@
+// page.tsx (updated version)
 import ProjectDetailsPage from './ProjectDetailsClient';
 import { getProjectDetailsBySlug } from '@/lib/getProjectDetailBySlug';
 import { notFound } from 'next/navigation';
@@ -7,35 +8,53 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// ISR revalidation - adjust based on how often your data changes
-export const revalidate = 86400; // 24 hours (or whatever works for you)
+export const revalidate = 300; // 5 minutes to match SWR
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getProjectDetailsBySlug(slug);
   
-  if (!project) {
-    return { title: 'Project Not Found' };
-  }
-
-  return {
-    title: project.title,
-    description: project.description,
-    openGraph: {
+  try {
+    const project = await getProjectDetailsBySlug(slug);
+    if (!project) {
+      return { 
+        title: 'Project Not Found',
+        description: 'The requested project could not be found.'
+      };
+    }
+    
+    return {
       title: project.title,
       description: project.description,
-      images: [project.image],
-    },
-  };
+      openGraph: { 
+        title: project.title,
+        description: project.description,
+        images: [project.image] 
+      },
+    };
+  } catch (error) {
+    console.error('Error generating metadata:', error);
+    return { 
+      title: 'Project Not Found',
+      description: 'The requested project could not be found.'
+    };
+  }
 }
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  const project = await getProjectDetailsBySlug(slug);
   
-  if (!project) {
-    return notFound();
+  try {
+    const project = await getProjectDetailsBySlug(slug);
+    console.log('Loaded project for slug:', slug, project ? 'Found' : 'Not found');
+    
+    if (!project) {
+      console.log('Project not found, calling notFound()');
+      notFound();
+    }
+    
+    return <ProjectDetailsPage initialData={project} slug={slug} />;
+  } catch (error) {
+    console.error('Error loading project:', error);
+    notFound();
   }
-
-  return <ProjectDetailsPage project={project} slug={slug} />;
 }

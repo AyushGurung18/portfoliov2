@@ -1,11 +1,14 @@
+// ProjectDetailsClient.tsx (updated version)
 'use client';
 
+import useSWR from "swr";
 import { TextareaForm } from "@/components/CommentBox";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FaGithub } from "react-icons/fa";
+import BeautifulError from "@/components/BeautifulError";
 import Image from "next/image";
 
 interface ContentSection {
@@ -26,18 +29,50 @@ interface ProjectDetails {
 }
 
 interface Props {
-  project: ProjectDetails;
+  initialData: ProjectDetails;
   slug: string;
 }
 
-export default function ProjectDetailsPage({ project, slug }: Props) {
-  const router = useRouter();
+interface APIError {
+  error: string;
+  errorType?: 'not_found' | 'bad_request' | 'server_error';
+  slug?: string;
+}
+
+export default function ProjectDetailsPage({ initialData, slug }: Props) {
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [activeSection, setActiveSection] = useState<string>("");
 
-  // Instant back navigation - no delays, no BS
-  const handleBackNavigation = () => {
-    router.back();
+  const fetcher = (url: string) =>
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((errorData: APIError) => {
+            const error = new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
+            (error as any).status = res.status;
+            (error as any).errorType = errorData.errorType;
+            (error as any).slug = errorData.slug;
+            throw error;
+          });
+        }
+        return res.json();
+      })
+      .then((data) => data.project[0]);
+
+  const { data: project, error, isLoading, mutate } = useSWR<ProjectDetails>(
+    `/api/project_details?slug=${slug}`,
+    fetcher,
+    {
+      fallbackData: initialData,
+      revalidateOnMount: false,
+      revalidateOnFocus: false,
+      refreshInterval: 5 * 60 * 1000,
+      dedupingInterval: 2000,
+    }
+  );
+
+  const handleRetry = () => {
+    mutate();
   };
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -52,6 +87,8 @@ export default function ProjectDetailsPage({ project, slug }: Props) {
   };
 
   useEffect(() => {
+    if (!project?.content_sections?.length) return;
+
     const handleScroll = () => {
       const offset = 120;
       const sectionElements = Object.entries(sectionRefs.current)
@@ -75,33 +112,125 @@ export default function ProjectDetailsPage({ project, slug }: Props) {
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [project]);
 
   const renderSectionContent = (content: string | string[] | undefined) => {
     if (!content) return null;
-    return Array.isArray(content)
-      ? (
-        <ul className="list-disc pl-5 text-gray-300">
-          {content.map((item, idx) => (
-            <li key={idx} className="mb-2">{item}</li>
-          ))}
-        </ul>
-      )
-      : <div className="text-gray-300 whitespace-pre-line">{content}</div>;
+    return Array.isArray(content) ? (
+      <ul className="list-disc pl-5 text-gray-300">
+        {content.map((item, idx) => (
+          <li key={idx} className="mb-2">{item}</li>
+        ))}
+      </ul>
+    ) : (
+      <div className="text-gray-300 whitespace-pre-line">{content}</div>
+    );
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white py-12">
+        <div className="mb-8">
+          <Skeleton className="h-6 w-32 bg-gray-800" />
+        </div>
+        <Skeleton className="w-full h-64 md:h-80 rounded-xl mb-10 bg-gray-800" />
+        <div className="flex items-center gap-3 mb-10">
+          <Skeleton className="w-1 h-8 rounded bg-gray-800" />
+          <Skeleton className="h-10 w-3/4 max-w-md bg-gray-800" />
+        </div>
+        <div className="flex flex-col md:flex-row gap-12">
+          <div className="flex-1">
+            {Array(3).fill(0).map((_, i) => (
+              <div key={i} className="mb-12">
+                <Skeleton className="h-8 w-64 mb-4 bg-gray-800" />
+                <Skeleton className="h-4 w-full mb-2 bg-gray-800" />
+                <Skeleton className="h-4 w-full mb-2 bg-gray-800" />
+                <Skeleton className="h-4 w-3/4 bg-gray-800" />
+              </div>
+            ))}
+          </div>
+          <aside className="w-full md:w-64 flex-shrink-0 sticky top-20 self-start hidden md:block">
+            <Skeleton className="h-8 w-48 mb-4 bg-gray-800" />
+            <div className="space-y-3">
+              {Array(4).fill(0).map((_, i) => (
+                <Skeleton key={i} className="h-5 w-full bg-gray-800" />
+              ))}
+            </div>
+          </aside>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    const errorType = (error as any).errorType;
+    const errorStatus = (error as any).status;
+    const errorSlug = (error as any).slug;
+
+    // Handle different error types
+    if (errorType === 'not_found' || errorStatus === 404) {
+      return (
+        <BeautifulError 
+          title="Project Not Found"
+          error={error.message}
+          description={`The project "${errorSlug || slug}" could not be found. It may have been moved, renamed, or deleted.`}
+          onRetry={handleRetry}
+          backTo="/projects"
+          backText="← Browse All Projects"
+          variant="warning"
+        />
+      );
+    }
+
+    if (errorType === 'server_error' || errorStatus >= 500) {
+      return (
+        <BeautifulError 
+          title="Server Error"
+          error={error.message}
+          description="We're experiencing technical difficulties. Please try again in a few moments."
+          onRetry={handleRetry}
+          backTo="/projects"
+          backText="← Back to Projects"
+          variant="error"
+        />
+      );
+    }
+
+    // Generic error fallback
+    return (
+      <BeautifulError 
+        title="Unable to Load Project"
+        error={error.message}
+        description="We encountered an error while loading this project. Please try again."
+        onRetry={handleRetry}
+        backTo="/projects"
+        backText="← Back to Projects"
+        variant="error"
+      />
+    );
+  }
+
+  if (!project) {
+    return (
+      <BeautifulError 
+        title="Project Data Missing"
+        error="Project data not available"
+        description="The project data is currently unavailable. Please try refreshing the page."
+        onRetry={handleRetry}
+        backTo="/projects"
+        backText="← Back to Projects"
+        variant="warning"
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white px-6 md:px-20 py-12">
-      {/* Back button - instant response */}
-      <div className="border-b border-[#1E2029] pb-8">
-        <button
-          onClick={handleBackNavigation}
-          className="text-blue-400 hover:text-blue-300 mb-8 inline-block transition-colors duration-150 hover:translate-x-[-2px]"
-        >
+    <div className="min-h-screen bg-black text-white py-12">
+      <div className="border-b border-gray-800 pb-8">
+        <Link href="/projects" className="text-blue-400 hover:underline mb-8 inline-block">
           ← Back to Projects
-        </button>
+        </Link>
         
-        {/* Hero Image */}
         <Image 
           src={project.image} 
           alt={project.title} 
@@ -110,26 +239,25 @@ export default function ProjectDetailsPage({ project, slug }: Props) {
           className="w-full rounded-xl mb-10 shadow-xl"
           priority
         />
-        
-        {/* Title */}
-        <h1 className="sm:text-4xl text-3xl my-3 font-extrabold">
+
+        <h1 className="sm:text-4xl text-3xl my-3 font-extrabold flex items-center gap-3">
           {project.title}
         </h1>
 
         <p className="my-2 text-sm sm:text-base text-gray-400">{project.description}</p>
         
-        <Link
-          href={project.project_url}
-          target="_blank"
-          className="flex items-center text-green-400 text-sm sm:text-base hover:text-green-300 transition-colors"
-        >
-          <FaGithub className="mr-2" /> Live Site
-        </Link>
-      </div>  
+        {project.project_url && (
+          <Link
+            href={project.project_url}
+            target="_blank"
+            className="flex items-center text-green-400 text-sm sm:text-base hover:underline"
+          >
+            <FaGithub className="mr-2" /> Live Site
+          </Link>
+        )}
+      </div>
 
-      {/* Content Layout */}
       <div className="flex flex-col md:flex-row gap-12 mt-10">
-        {/* Main Content */}
         <div className="flex-1">
           {project.content_sections?.map((section, index) => (
             <section
@@ -147,70 +275,33 @@ export default function ProjectDetailsPage({ project, slug }: Props) {
               {renderSectionContent(section.content)}
             </section>
           ))}
-
-          {/* Technologies Section */}
-          {project.technologies && project.technologies.length > 0 && (
-            <section className="mb-12">
-              <h2 className="flex sm:text-3xl text-2xl font-bold mb-4">
-                <span className="w-1 h-8 bg-green-500 block rounded mr-3"></span>
-                Technologies Used
-              </h2>
-              <div className="flex flex-wrap gap-3">
-                {project.technologies.map((tech, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 bg-gray-800 text-green-400 rounded-md text-sm"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* GitHub Section */}
-          {project.github && (
-            <section className="mb-12">
-              <h2 className="flex sm:text-3xl text-2xl font-bold mb-4">
-                <span className="w-1 h-8 bg-green-500 block rounded mr-3"></span>
-                Source Code
-              </h2>
-              <Link
-                href={project.github}
-                target="_blank"
-                className="flex items-center text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                <FaGithub className="mr-2" /> View on GitHub
-              </Link>
-            </section>
-          )}
         </div>
 
-        {/* Table of Contents */}
-        <aside className="w-full md:w-64 flex-shrink-0 sticky top-32 self-start hidden md:block">
-          <h3 className="text-xl font-bold mb-4">Table of Contents</h3>
-          <ul className="space-y-2">
-            {project.content_sections?.map((section, index) => (
-              <li key={index}>
-                <a
-                  href={`#${section.id}`}
-                  onClick={(e) => scrollToSection(e, section.id)}
-                  className={clsx(
-                    "hover:text-green-400 text-sm block transition-colors",
-                    activeSection === section.title
-                      ? "text-green-500 font-semibold"
-                      : "text-gray-400"
-                  )}
-                >
-                  {section.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </aside>
+        {project.content_sections?.length > 0 && (
+          <aside className="w-full md:w-64 flex-shrink-0 sticky top-32 self-start hidden md:block">
+            <h3 className="text-xl font-bold mb-4">Table of Contents</h3>
+            <ul className="space-y-2">
+              {project.content_sections.map((section, index) => (
+                <li key={index}>
+                  <a
+                    href={`#${section.id}`}
+                    onClick={(e) => scrollToSection(e, section.id)}
+                    className={clsx(
+                      "hover:text-green-400 text-sm block transition",
+                      activeSection === section.title
+                        ? "text-green-500 font-semibold"
+                        : "text-gray-400"
+                    )}
+                  >
+                    {section.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
       </div>
 
-      {/* Comment Section */}
       <div className="space-y-8 mt-16">
         <TextareaForm page={`project/${slug}`} />
       </div>

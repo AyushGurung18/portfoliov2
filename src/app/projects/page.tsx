@@ -16,6 +16,7 @@ import BeautifulError from "@/components/BeautifulError";
 import Image from "next/image";
 
 type Project = {
+  id: number;
   title: string;
   description: string;
   image: string;
@@ -42,6 +43,17 @@ const LoadingSpinner = () => {
       transition={{ loop: Infinity, duration: 0.7 }}
     />
   );
+};
+
+// Helper function to generate clean slug (no ID prefix)
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .trim();
 };
 
 const Projects = () => {
@@ -87,10 +99,11 @@ const Projects = () => {
     return (
       <BeautifulError
         title="Projects Not Found"
-        description={`The Projects could not be found. It may have been moved or deleted.`}
+        description="The projects could not be loaded. Please try again later."
         backTo="/"
         backText="← Go Back"
         variant="warning"
+        onRetry={() => mutate("/api/projects", undefined, { revalidate: true })}
       />
     );
   }
@@ -138,15 +151,17 @@ const Projects = () => {
         <AnimatePresence>
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => {
-              const slug = project.title.toLowerCase().replace(/\s+/g, "-");
+              // Generate clean slug without ID
+              const slug = generateSlug(project.title);
+              
               return (
-                <Link key={`${project.title}-${index}`} href={`/projects/${slug}`} prefetch>
+                <Link key={`${project.id}-${project.title}`} href={`/projects/${slug}`} prefetch>
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 30 }}
                     transition={{ delay: index * 0.1, duration: 1 }}
-                    className="bg-black pb-4 border border-[#1E2029] tracking-tighter rounded-lg shadow-lg flex flex-col h-full cursor-pointer"
+                    className="bg-black pb-4 border border-[#1E2029] tracking-tighter rounded-lg shadow-lg flex flex-col h-full cursor-pointer hover:border-[#3CCF91] transition-colors duration-300"
                   >
                     <Image
                       src={project.image}
@@ -161,7 +176,17 @@ const Projects = () => {
                       <div className="flex flex-wrap gap-2 mb-4">
                         {project.technologies.map((tech, techIndex) => {
                           const techInfo = techStack[tech];
-                          if (!techInfo) return null;
+                          if (!techInfo) {
+                            // Fallback for technologies not in techStack
+                            return (
+                              <span
+                                key={techIndex}
+                                className="px-3 py-1 text-sm rounded-full bg-gray-800 text-gray-300 border border-gray-600"
+                              >
+                                {tech}
+                              </span>
+                            );
+                          }
                           return (
                             <span
                               key={techIndex}
@@ -183,10 +208,11 @@ const Projects = () => {
                         <p className="text-[#869094] text-sm sm:text-base">{project.description}</p>
                         <div className="mt-auto pt-4">
                           <a
-                            href={project.github || "https://github.com/default"}
+                            href={project.github || "https://github.com"}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex space-x-2 w-auto px-6 py-2 text-base font-semibold text-white bg-[#141414] rounded hover:bg-[#292929] cursor-pointer"
+                            className="inline-flex space-x-2 w-auto px-6 py-2 text-base font-semibold text-white bg-[#141414] rounded hover:bg-[#292929] cursor-pointer transition-colors"
+                            onClick={(e) => e.stopPropagation()} // Prevent Link navigation when clicking GitHub link
                           >
                             <FaGithub size={20} />
                             <span>View Source</span>
