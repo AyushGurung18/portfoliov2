@@ -45,10 +45,8 @@ export default async function Page({ params }: Props) {
   
   try {
     const project = await getProjectDetailsBySlug(slug);
-    console.log('Loaded project for slug:', slug, project ? 'Found' : 'Not found');
     
     if (!project) {
-      console.log('Project not found, calling notFound()');
       notFound();
     }
     

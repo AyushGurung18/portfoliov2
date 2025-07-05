@@ -13,9 +13,7 @@ function generateSlug(title: string): string {
 }
 
 export async function getProjectDetailsBySlug(slug: string) {
-  try {
-    console.log('Looking for project with slug:', slug);
-    
+  try {    
     // First, get all projects to find the one with matching slug
     const { data: allProjects, error: projectsError } = await supabase
       .from("projects")
@@ -38,15 +36,8 @@ export async function getProjectDetailsBySlug(slug: string) {
 
     if (!matchingProject) {
       console.error('No project found with slug:', slug);
-      console.log('Available slugs:', allProjects.map(p => ({ 
-        id: p.id, 
-        title: p.title, 
-        slug: generateSlug(p.title) 
-      })));
       return null;
     }
-
-    console.log('Found matching project:', matchingProject);
 
     // Now fetch the full project details using the ID
     const { data, error } = await supabase
@@ -96,7 +87,6 @@ export async function getProjectDetailsBySlug(slug: string) {
       github: data.github || "",
     };
 
-    console.log('Successfully processed project:', result.title);
     return result;
   } catch (error) {
     console.error('Error in getProjectDetailsBySlug:', error);

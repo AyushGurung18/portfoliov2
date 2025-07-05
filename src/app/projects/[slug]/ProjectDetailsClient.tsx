@@ -48,10 +48,10 @@ export default function ProjectDetailsPage({ initialData, slug }: Props) {
       .then((res) => {
         if (!res.ok) {
           return res.json().then((errorData: APIError) => {
-            const error = new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
-            (error as any).status = res.status;
-            (error as any).errorType = errorData.errorType;
-            (error as any).slug = errorData.slug;
+            const error = new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`) as Partial<APIError> & { status?: number };
+            error.status = res.status;
+            error.errorType = errorData.errorType;
+            error.slug = errorData.slug;
             throw error;
           });
         }
