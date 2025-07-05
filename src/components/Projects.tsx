@@ -23,6 +23,7 @@ type Project = {
   image: string;
   technologies: string[];
   github: string;
+  slug: string;
 };
 
 const Projects = () => {
@@ -59,14 +60,6 @@ const Projects = () => {
       opacity: 1,
       transition: { duration: 1, ease: 'easeOut' },
     },
-  };
-
-  // Helper function to generate clean slug from title
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
   };
 
   return (
@@ -117,7 +110,7 @@ const Projects = () => {
         {projects.map((project, index) => {
           const isRight = index % 2 === 0;
           const isActive = activeIndex === index;
-          const projectSlug = generateSlug(project.title);
+          const projectSlug = (project.slug);
 
           return (
             <motion.div

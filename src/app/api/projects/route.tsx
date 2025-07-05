@@ -6,8 +6,11 @@ export async function GET() {
     // Select id field along with other fields
     const { data: projects, error } = await supabase
       .from('projects')
-      .select('id, title, description, image, technologies, github, created_at')
+      .select('title, description, image, technologies, github, slug, created_at')
       .order('created_at', { ascending: false });
+
+      console.log('project' , projects);
+      
 
     if (error) {
       console.error('Error fetching projects:', error);

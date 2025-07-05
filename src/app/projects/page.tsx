@@ -22,6 +22,7 @@ type Project = {
   image: string;
   technologies: string[];
   github: string;
+  slug: string;
 };
 
 type TechStack = {
@@ -43,17 +44,6 @@ const LoadingSpinner = () => {
       transition={{ loop: Infinity, duration: 0.7 }}
     />
   );
-};
-
-// Helper function to generate clean slug (no ID prefix)
-const generateSlug = (title: string): string => {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single
-    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-    .trim();
 };
 
 const Projects = () => {
@@ -152,10 +142,9 @@ const Projects = () => {
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => {
               // Generate clean slug without ID
-              const slug = generateSlug(project.title);
               
               return (
-                <Link key={`${project.id}-${project.title}`} href={`/projects/${slug}`} prefetch>
+                <Link href={`/projects/${project.slug}`} prefetch>
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}

@@ -19,7 +19,7 @@ interface Blog {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Blogs = () => {
-  const { data, error, isLoading } = useSWR<Blog[]>('/api/blogs', fetcher);
+  const { data, error } = useSWR<Blog[]>('/api/blogs', fetcher);
 
   const blogsRef = useRef(null);
   const contactRef = useRef(null);
@@ -84,9 +84,6 @@ const Blogs = () => {
 
         {/* Blog section */}
         <div ref={blogsRef}>
-          {isLoading && (
-            <p className="text-center text-gray-400 py-10">Loading articles...</p>
-          )}
           {error && (
             <p className="text-center text-red-500 py-10">Failed to load blogs.</p>
           )}
