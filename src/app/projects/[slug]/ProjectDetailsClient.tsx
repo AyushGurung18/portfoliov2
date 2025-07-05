@@ -162,11 +162,11 @@ export default function ProjectDetailsPage({ initialData, slug }: Props) {
     );
   }
 
-  if (error) {
-    const errorType = (error as any).errorType;
-    const errorStatus = (error as any).status;
-    const errorSlug = (error as any).slug;
-
+if (error) {
+    const typedError = error as Partial<APIError> & { status?: number };
+    const errorType = typedError.errorType;
+    const errorStatus = typedError.status;
+    const errorSlug = typedError.slug;
     // Handle different error types
     if (errorType === 'not_found' || errorStatus === 404) {
       return (
@@ -182,7 +182,7 @@ export default function ProjectDetailsPage({ initialData, slug }: Props) {
       );
     }
 
-    if (errorType === 'server_error' || errorStatus >= 500) {
+    if (errorType === 'server_error' || (typeof errorStatus === 'number' && errorStatus >= 500)) {
       return (
         <BeautifulError 
           title="Server Error"
