@@ -31,9 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     };
   } catch (error) {
+    console.error('Error generating metadata:', error);
     return {
       title: 'Project Not Found',
-      description: 'The requested project could not be found.',
+      description: 'The requested project could not be found. ',
     };
   }
 }
@@ -47,6 +48,7 @@ export default async function Page({ params }: Props) {
 
     return <ProjectDetailsPage initialData={project} slug={slug} />;
   } catch (error) {
+    console.error('Error fetching project details:', error);
     notFound();
   }
 }

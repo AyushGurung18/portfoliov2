@@ -144,7 +144,7 @@ const Projects = () => {
               // Generate clean slug without ID
               
               return (
-                <Link href={`/projects/${project.slug}`} prefetch>
+              <Link key={project.slug} href={`/projects/${project.slug}`} prefetch>
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
