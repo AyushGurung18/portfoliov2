@@ -4,14 +4,14 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export const revalidate = 300; // 5 minutes
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = params;
-
+  const { slug } = await params;
+  
   try {
     const project = await getProjectDetailsBySlug(slug);
     if (!project) {
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: 'The requested project could not be found.',
       };
     }
-
+    
     return {
       title: project.title,
       description: project.description,
@@ -34,18 +34,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     console.error('Error generating metadata:', error);
     return {
       title: 'Project Not Found',
-      description: 'The requested project could not be found. ',
+      description: 'The requested project could not be found.',
     };
   }
 }
 
 export default async function Page({ params }: Props) {
-  const { slug } = params;
-
+  const { slug } = await params;
+  
   try {
     const project = await getProjectDetailsBySlug(slug);
     if (!project) notFound();
-
+    
     return <ProjectDetailsPage initialData={project} slug={slug} />;
   } catch (error) {
     console.error('Error fetching project details:', error);
