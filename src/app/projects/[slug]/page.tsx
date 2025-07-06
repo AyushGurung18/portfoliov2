@@ -7,7 +7,7 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 60 * 60 * 24 * 15; // 15 days
+export const revalidate = 1296000;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
