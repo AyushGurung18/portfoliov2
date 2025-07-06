@@ -30,7 +30,11 @@ type Project = {
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const Projects = () => {
-  const { data } = useSWR('/api/projects', fetcher);
+  const { data } = useSWR('/api/projects', fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 1000 * 60 * 60 * 24, // 24 hours
+  });
+  
   const projects: Project[] = data?.projects || [];
   const techStack: TechStack = data?.techStack || {};
 
@@ -92,11 +96,11 @@ const Projects = () => {
         <p className="lg:text-xl text-lg text-[#869094] mb-6">
           Here&apos;s some of my projects that I have worked on.
         </p>
+        {/* Add prefetch to main "Explore more" link */}
         <Link
           href="/projects"
-          className="lg:text-base text-xs text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center"
-        >
-          Explore more →
+          prefetch
+        ><span className="lg:text-base text-xs text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center">Explore more →</span>
         </Link>
       </motion.div>
 
@@ -129,21 +133,27 @@ const Projects = () => {
                   transition: 'filter 0.3s ease',
                 }}
               >
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  width={600}
-                  height={400}
-                  className="w-full object-cover rounded-lg shadow-lg"
-                  style={{ borderRadius: '25px 25px 0px 0px' }}
-                  priority={index < 2}
-                />
+                {/* Wrap entire image in Link for better UX */}
+                <Link href={`/projects/${project.slug}`} prefetch>
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    width={600}
+                    height={400}
+                    className="w-full object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                    style={{ borderRadius: '25px 25px 0px 0px' }}
+                    priority={index < 2}
+                  />
+                </Link>
+                
                 <div className="p-6">
-                  <Link href={`/projects/${project.slug}`}>
+                  {/* Add prefetch to project title link */}
+                  <Link href={`/projects/${project.slug}`} prefetch>
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 hover:text-[#3CCF91] transition-colors cursor-pointer">
                       {project.title}
                     </h3>
                   </Link>
+                  
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.map((tech, techIndex) => {
                       const techInfo = techStack[tech] || {
@@ -167,9 +177,19 @@ const Projects = () => {
                       );
                     })}
                   </div>
+                  
                   <p className="text-[#869094] tracking-tight text-sm sm:text-base mb-6 line-clamp-2">
                     {project.description}
                   </p>
+                  
+                  {/* Add a "View Project" button for better UX */}
+                  <Link 
+                    href={`/projects/${project.slug}`} 
+                    prefetch
+                    className="inline-flex items-center text-[#3CCF91] hover:text-[#2ba577] transition-colors text-sm font-medium"
+                  >
+                    View Project →
+                  </Link>
                 </div>
               </div>
               <div className="md:w-1/2" />
