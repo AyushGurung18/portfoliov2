@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ayush Gurung – Software Engineer Portfolio
 
-## Getting Started
+> A minimal, high-performance developer portfolio built with Next.js App Router, showcasing personal projects, technical blogs, and contact interface – designed for clarity, speed, and authenticity.
 
-First, run the development server:
+![Homepage](./public/screenshots/homepage.png)
+
+
+**Live Site** → [ayushgurung.com](https://ayushgurung.com)
+
+---
+
+## 🚀 Tech Stack
+
+- **Framework:** [Next.js 15 (App Router)](https://nextjs.org/)
+- **Styling:** TailwindCSS + Framer Motion
+- **Data Layer:** Supabase (PostgreSQL) + API Routes
+- **Caching Strategy:** ISR (Incremental Static Regeneration) + SWR for client hydration
+- **Email & Forms:** Supabase + Resend + CAPTCHA
+- **Markdown CMS:** GitHub Issues-based blog system
+
+---
+
+## 📁 Features
+
+- **Projects & Blogs with Slugs:** Fully SEO-optimized pages generated per slug using dynamic routing and static caching.
+- **Unified Data Fetching:** Centralized data helper functions power both ISR and SWR for DRY and maintainable logic.
+- **Blog System via GitHub Issues:** Write once, publish everywhere — zero CMS overhead.
+- **Instant Navigation UX:** Prehydrated layouts and cached SWR responses create fast, no-jitter transitions.
+- **Contact Form:** Spam-protected contact pop-up with Supabase integration and Resend email notifications.
+- **Dynamic Table of Contents:** On long pages like blog/projects, a live ToC improves reading/navigation flow.
+- **Production-grade Setup:** Deploy-ready and structured for growth, not just aesthetics.
+
+---
+
+## 🧪 Running Locally
 
 ```bash
+git clone https://github.com/ayushgurung18/portfolio.git
+cd portfolio
+npm install
+cp .env.example .env.local  # Add Supabase + Resend keys
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Folder Structure
+.
+├── app/                # Next.js App Router pages
+├── components/         # UI components
+├── lib/                # Reusable helpers (SWR, metadata, fetchers)
+├── public/             # Static assets
+├── styles/             # Global styles and animations
+└── supabase/           # DB structure, config (optional)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Contact
+> Feel free to reach out via:
 
-## Learn More
+- **Email**: ayushgurung18sep@gmail.com
 
-To learn more about Next.js, take a look at the following resources:
+- **LinkedIn**: linkedin.com/in/ayushgurung
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Twitter**: @ayushgurung18
