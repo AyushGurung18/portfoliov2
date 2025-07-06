@@ -92,9 +92,10 @@ const Blogs = () => {
                   </div>
 
                   <div className="flex flex-col md:ml-14">
-                    <Link
-                      href={`/blogs/${blog.title.toLowerCase().replace(/\s+/g, '-')}`}
+                    <Link 
+                      href={`/blogs/${blog.title.toLowerCase().replace(/\s+/g, '-')}`} 
                       className="group"
+                      prefetch
                     >
                       <h3 className="text-[#fffefd] text-xl sm:text-2xl font-semibold group-hover:underline transition-all duration-200">
                         {blog.title}
