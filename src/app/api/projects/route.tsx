@@ -7,10 +7,7 @@ export async function GET() {
     const { data: projects, error } = await supabase
       .from('projects')
       .select('title, description, image, technologies, github, slug, created_at')
-      .order('created_at', { ascending: false });
-
-      console.log('project' , projects);
-      
+      .order('created_at', { ascending: false });      
 
     if (error) {
       console.error('Error fetching projects:', error);

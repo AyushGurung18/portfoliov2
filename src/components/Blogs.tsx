@@ -113,13 +113,13 @@ const Blogs = () => {
           >
             <motion.div variants={itemVariants} className="py-10 mt-5 sm:mt-20 flex flex-col text-center">
               <h1 className="sm:text-5xl text-4xl font-bold mb-10 mt-6">Keep in Touch</h1>
-              <h3 className="text-sm sm:text-base text-[#869094]">
+              <h2 className="text-sm sm:text-base text-[#869094]">
                 I&apos;m currently specializing in{' '}
                 <span className="text-[#3CCF91] hover:text-[#2ba577]">Full-stack Development</span>
-              </h3>
-              <h3 className="text-sm sm:text-base text-[#869094]">
+              </h2>
+              <h2 className="text-sm sm:text-base text-[#869094]">
                 Feel free to get in touch and talk more about your projects.
-              </h3>
+              </h2>
             </motion.div>
 
             <motion.div whileHover={{ scale: 1.05 }} variants={itemVariants} className="flex gap-4 justify-center">

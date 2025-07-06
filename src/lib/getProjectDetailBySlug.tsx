@@ -17,10 +17,7 @@ export async function getProjectDetailsBySlug(slug: string) {
         )
       `)
       .eq("slug", slug)
-      .single();
-
-      console.log("Fetched project details:", data);
-      
+      .single();      
 
     if (error) throw new Error(error.message);
     if (!data) return null;
