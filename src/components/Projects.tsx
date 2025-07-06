@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
+import useSWR from 'swr';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -26,29 +27,23 @@ type Project = {
   slug: string;
 };
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 const Projects = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [techStack, setTechStack] = useState<TechStack>({});
+  const { data } = useSWR('/api/projects', fetcher);
+  const projects: Project[] = data?.projects || [];
+  const techStack: TechStack = data?.techStack || {};
+
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      const res = await fetch('/api/projects');
-      const data = await res.json();
-      setProjects(data.projects);
-      setTechStack(data.techStack);
-    };
-    fetchProjects();
-  }, []);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: '-100px 0px', once: true });
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.5 } },
   };
-
-  const ref = useRef(null);
-  const isInView = useInView(ref, { margin: '-100px 0px', once: true });
 
   const itemVariants = {
     hidden: (isRight: boolean) => ({
@@ -62,16 +57,21 @@ const Projects = () => {
     },
   };
 
+  const handleSectionMouseEnter = () => setIsHovering(true);
+  const handleSectionMouseLeave = () => {
+    setIsHovering(false);
+    setActiveIndex(null);
+  };
+
+  const handleProjectMouseEnter = (index: number) => setActiveIndex(index);
+  const handleProjectMouseLeave = () => setActiveIndex(null);
+
   return (
     <section
       className="relative max-w-[1200px] tracking-tighter mx-auto px-8 py-20 overflow-x-hidden"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => {
-        setIsHovering(false);
-        setActiveIndex(null);
-      }}
+      onMouseEnter={handleSectionMouseEnter}
+      onMouseLeave={handleSectionMouseLeave}
     >
-      {/* Dark overlay on entire section */}
       {isHovering && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -110,34 +110,36 @@ const Projects = () => {
         {projects.map((project, index) => {
           const isRight = index % 2 === 0;
           const isActive = activeIndex === index;
-          const projectSlug = (project.slug);
 
           return (
             <motion.div
-              key={index}
+              key={`project-${project.id}-${index}`}
               custom={isRight}
               variants={itemVariants}
               className={`group flex flex-col ${
                 isRight ? 'md:flex-row-reverse' : 'md:flex-row'
               } gap-12 mt-0 sm:mt-0 md:-mt-[192px] lg:-mt-[222px] items-center`}
             >
-              <div className="w-full md:w-1/2 bg-[#080808] border border-[#1E2029] rounded-3xl" 
-                onMouseEnter={() => setActiveIndex(index)}
-                onMouseLeave={() => setActiveIndex(null)}
+              <div
+                className="w-full md:w-1/2 bg-[#080808] border border-[#1E2029] rounded-3xl"
+                onMouseEnter={() => handleProjectMouseEnter(index)}
+                onMouseLeave={handleProjectMouseLeave}
                 style={{
                   filter: isHovering && !isActive ? 'brightness(30%)' : 'brightness(100%)',
                   transition: 'filter 0.3s ease',
-                }}>
+                }}
+              >
                 <Image
                   src={project.image}
                   alt={project.title}
-                  width={600} height={400}
+                  width={600}
+                  height={400}
                   className="w-full object-cover rounded-lg shadow-lg"
                   style={{ borderRadius: '25px 25px 0px 0px' }}
-                  priority
+                  priority={index < 2}
                 />
                 <div className="p-6">
-                  <Link href={`/projects/${projectSlug}`}>
+                  <Link href={`/projects/${project.slug}`}>
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 hover:text-[#3CCF91] transition-colors cursor-pointer">
                       {project.title}
                     </h3>
@@ -151,7 +153,7 @@ const Projects = () => {
                       };
                       return (
                         <span
-                          key={techIndex}
+                          key={`${tech}-${techIndex}`}
                           className="px-3 py-1 text-sm rounded-full flex items-center gap-1"
                           style={{
                             backgroundColor: `${techInfo.color}15`,
@@ -165,10 +167,12 @@ const Projects = () => {
                       );
                     })}
                   </div>
-                  <p className="text-[#869094] tracking-tight text-sm sm:text-base mb-6 line-clamp-2">{project.description}</p>
+                  <p className="text-[#869094] tracking-tight text-sm sm:text-base mb-6 line-clamp-2">
+                    {project.description}
+                  </p>
                 </div>
               </div>
-              <div className="md:w-1/2"></div>
+              <div className="md:w-1/2" />
             </motion.div>
           );
         })}
