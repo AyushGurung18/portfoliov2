@@ -41,8 +41,11 @@ npm install
 cp .env.example .env.local  # Add Supabase + Resend keys
 npm run dev
 ```
+---
 
-# Folder Structure
+## Folder Structure
+
+```bash
 .
 ├── app/                # Next.js App Router pages
 ├── components/         # UI components
@@ -50,13 +53,12 @@ npm run dev
 ├── public/             # Static assets
 ├── styles/             # Global styles and animations
 └── supabase/           # DB structure, config (optional)
+```
+---
 
-
-# Contact
+## Contact
 > Feel free to reach out via:
 
 - **Email**: ayushgurung18sep@gmail.com
-
 - **LinkedIn**: linkedin.com/in/ayushgurung
-
 - **Twitter**: @ayushgurung18
