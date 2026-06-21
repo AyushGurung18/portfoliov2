@@ -51,14 +51,13 @@ const Blogs = () => {
           <div className="flex text-xl sm:text-2xl items-center">
             <IoNewspaperOutline />
             &nbsp;
-            <h2 style={{ fontFamily: 'Ubuntu, sans-serif' }} className="text-2xl font-bold">
-              Latest Articles
+            <h2 style={{ fontFamily: 'Ubuntu, sans-serif' }} className="text-2xl font-bold tracking-tighter">
+              Engineering Notes
             </h2>
           </div>
-          {/* Add prefetch to "View all articles" link */}
           <Link href="/blogs" prefetch>
-            <span className="lg:text-base text-xs text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center">
-              View all articles →
+            <span className="lg:text-base text-sm font-medium text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center tracking-tight">
+              View all notes →
             </span>
           </Link>
         </div>
@@ -112,13 +111,13 @@ const Blogs = () => {
             animate={isContactInView ? 'visible' : 'hidden'}
           >
             <motion.div variants={itemVariants} className="py-10 mt-5 sm:mt-20 flex flex-col text-center">
-              <h1 className="sm:text-5xl text-4xl font-bold mb-10 mt-6">Keep in Touch</h1>
-              <h2 className="text-sm sm:text-base text-[#869094]">
-                I&apos;m currently specializing in{' '}
-                <span className="text-[#3CCF91] hover:text-[#2ba577]">Full-stack Development</span>
+              <h1 className="sm:text-5xl text-4xl font-bold mb-10 mt-6 tracking-tighter">Keep in Touch</h1>
+              <h2 className="text-sm sm:text-base text-[#869094] mb-2 tracking-tight">
+                Currently building and scaling{' '}
+                <span className="text-[#3CCF91] font-medium">Production AI Systems & MLOps</span>.
               </h2>
-              <h2 className="text-sm sm:text-base text-[#869094]">
-                Feel free to get in touch and talk more about your projects.
+              <h2 className="text-sm sm:text-base text-[#869094] tracking-tight">
+                Feel free to get in touch to talk about edge gateways, RAG pipelines, or full-stack engineering.
               </h2>
             </motion.div>
 
