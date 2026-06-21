@@ -22,7 +22,7 @@ const Header = () => {
                     href="/projects"
                     className="py-2 rounded-md transition-all duration-300 ease-in-out"
                   >
-                    Projects
+                    Systems
                   </Link>
                 </li>
                 <li>
@@ -30,7 +30,7 @@ const Header = () => {
                     href="/blogs"
                     className="py-2 rounded-md transition-all duration-300 ease-in-out"
                   >
-                    Blogs
+                    Notes
                   </Link>
                 </li>
                 <li>

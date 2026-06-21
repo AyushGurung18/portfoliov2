@@ -92,15 +92,14 @@ const Projects = () => {
         transition={{ duration: 0.8, delay: 0.2 }}
         className="mb-20 relative z-20"
       >
-        <h2 className="text-xl sm:text-2xl font-bold mb-4">All Creative Works.</h2>
-        <p className="lg:text-xl text-lg text-[#869094] mb-6">
-          Here&apos;s some of my projects that I have worked on.
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter text-white mb-4">Production Systems.</h2>
+        <p className="lg:text-xl text-lg text-[#869094] mb-6 max-w-2xl leading-relaxed tracking-tight">
+          High-performance RAG pipelines, edge-cached AI gateways, and full-stack orchestration. Here is what I have built.
         </p>
-        {/* Add prefetch to main "Explore more" link */}
         <Link
           href="/projects"
           prefetch
-        ><span className="lg:text-base text-xs text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center">Explore more →</span>
+        ><span className="lg:text-base text-sm font-medium text-[#3CCF91] hover:text-[#2ba577] transition-colors inline-flex items-center">Explore all systems →</span>
         </Link>
       </motion.div>
 
