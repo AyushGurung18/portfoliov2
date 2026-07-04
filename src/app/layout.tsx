@@ -63,9 +63,6 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-  alternates: {
-    canonical: "https://ayushgurung.com",
-  },
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
