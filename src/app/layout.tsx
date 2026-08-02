@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Inter, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -8,6 +8,12 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-source-serif",
 });
 
 export const metadata = {
@@ -77,7 +83,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased bg-black text-gray-100`}>
+      <body className={`${inter.variable} ${sourceSerif.variable} antialiased bg-black text-gray-100`}>
         <Header />
         <main className="p-4">{children}</main>
         <Footer />

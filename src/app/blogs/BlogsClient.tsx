@@ -4,7 +4,7 @@ import useSWR, { mutate } from "swr";
 import { useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import Link from "next/link";
-import { FiRefreshCw } from "react-icons/fi";
+import { Search, RefreshCw, Clock, Calendar, ArrowRight } from "lucide-react";
 
 type Blogs = {
   title: string;
@@ -20,7 +20,7 @@ const Blogs = () => {
   const rotate = useMotionValue(0);
   const rotation = useTransform(rotate, [0, 1], [0, 360]);
 
-  const { data } = useSWR("/api/blogs", fetcher, {
+  const { data, isLoading } = useSWR("/api/blogs", fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 1000 * 60 * 60, // 1 hour
   });
@@ -43,83 +43,117 @@ const Blogs = () => {
   );
 
   return (
-    <motion.div
-      className="bg-black text-white p-7 my-12"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="py-12 my-12 mb-8">
-        <h1 className="sm:text-7xl text-5xl tracking-tighter font-bold">Blog</h1>
-        <br />
-        <p className="text-sm sm:text-base tracking-tighter">
-          This is where I share my writings on programming, tutorials, and my experiences.
-        </p>
-        <div className="flex items-center mt-4 justify-between">
-          <input
-            type="text"
-            placeholder="Search articles"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-2 bg-[#1E2029] w-96 text-white border border-[#3CCF91] rounded"
-          />
-          <motion.div className="ms-8 flex justify-end" style={{ rotate: rotation }}>
-            <FiRefreshCw
-              className="cursor-pointer text-[#3CCF91] hover:text-[#2ba577] transition-colors"
-              size={20}
-              onClick={handleRefresh}
-            />
-          </motion.div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-3xl mx-auto px-6 pt-28 pb-8 md:pt-36">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="text-sm font-medium tracking-wide text-[#3CCF91] mb-3">Writing</p>
+          <h1 className="font-serif text-5xl sm:text-6xl font-bold tracking-tight mb-5">
+            Notes &amp; Essays
+          </h1>
+          <p className="text-lg text-gray-400 leading-relaxed max-w-xl">
+            Thoughts on programming, systems I&apos;m building, and things I&apos;ve learned along the way.
+          </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-1">
-        <AnimatePresence>
-          {filteredBlogs.length > 0 ? (
-            filteredBlogs.map((blog, index) => (
-              <motion.div
-                key={`${blog.title}-${index}`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 30 }}
-                transition={{ delay: index * 0.1, duration: 1 }}
-                className="border-t border-[#1E2029] py-6"
-              >
-                <div className="flex flex-col md:flex-row">
-                  <div className="w-full md:w-36 md:shrink-0 text-left md:text-right text-sm text-[#7f8b97] leading-relaxed mb-4 md:mb-0 md:me-3">
-                    <p className="mb-1 text-sm sm:text-base">{blog.date}</p>
-                    <p className="mb-1">{blog.read_time}</p>
-                  </div>
-
-                  <div className="flex flex-col md:ml-14">
-                    <Link 
-                      href={`/blogs/${blog.title.toLowerCase().replace(/\s+/g, '-')}`} 
-                      className="group"
-                      prefetch
-                    >
-                      <h3 className="text-[#fffefd] text-xl sm:text-2xl font-semibold group-hover:underline transition-all duration-200">
-                        {blog.title}
-                      </h3>
-                    </Link>
-                    <p className="my-1 text-sm sm:text-base text-[#7f8b97]">{blog.summary}</p>
-                    <Link
-                      href={`/blogs/${blog.title.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="text-[#3CCF91] text-sm mt-1 hover:underline transition-all duration-200 inline-flex items-center w-fit"
-                    >
-                      Learn more →
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            ))
-          ) : (
-            <div className="text-center py-12 text-[#7f8b97]">
-              {searchTerm ? "No blogs found matching your search." : "No blogs available."}
+          <div className="flex items-center gap-3 mt-8">
+            <div className="relative flex-1">
+              <Search
+                size={16}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+              />
+              <input
+                type="text"
+                placeholder="Search articles"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-full border border-white/10 bg-white/[0.04] py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-gray-500 outline-none transition-colors focus:border-[#3CCF91]/60 focus:bg-white/[0.06]"
+              />
             </div>
-          )}
-        </AnimatePresence>
+            <motion.button
+              type="button"
+              onClick={handleRefresh}
+              aria-label="Refresh articles"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-gray-400 transition-colors hover:border-[#3CCF91]/60 hover:text-[#3CCF91]"
+              style={{ rotate: rotation }}
+            >
+              <RefreshCw size={16} />
+            </motion.button>
+          </div>
+        </motion.div>
       </div>
-    </motion.div>
+
+      <div className="max-w-3xl mx-auto px-6 pb-24">
+        {isLoading ? (
+          <div className="divide-y divide-white/10 border-t border-white/10">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse py-8">
+                <div className="mb-3 h-3 w-32 rounded bg-white/10" />
+                <div className="mb-3 h-7 w-3/4 rounded bg-white/10" />
+                <div className="h-4 w-full rounded bg-white/10" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border-t border-white/10">
+            <AnimatePresence>
+              {filteredBlogs.length > 0 ? (
+                filteredBlogs.map((blog, index) => {
+                  const slug = blog.title.toLowerCase().replace(/\s+/g, '-');
+                  return (
+                    <motion.article
+                      key={`${blog.title}-${index}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{ delay: Math.min(index * 0.06, 0.3), duration: 0.5 }}
+                      className="group border-b border-white/10"
+                    >
+                      <Link href={`/blogs/${slug}`} className="block py-8" prefetch>
+                        <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-gray-500 mb-3">
+                          <span className="inline-flex items-center gap-1.5">
+                            <Calendar size={12} />
+                            {blog.date}
+                          </span>
+                          {blog.read_time && (
+                            <>
+                              <span className="text-gray-700">&middot;</span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <Clock size={12} />
+                                {blog.read_time} min read
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        <h2 className="font-serif text-2xl sm:text-3xl font-bold leading-snug text-white transition-colors group-hover:text-[#3CCF91]">
+                          {blog.title}
+                        </h2>
+
+                        <p className="mt-3 text-base leading-relaxed text-gray-400 line-clamp-2">
+                          {blog.summary}
+                        </p>
+
+                        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#3CCF91] opacity-0 transition-opacity group-hover:opacity-100">
+                          Read article
+                          <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                        </span>
+                      </Link>
+                    </motion.article>
+                  );
+                })
+              ) : (
+                <div className="py-24 text-center text-gray-500">
+                  {searchTerm ? "No articles found matching your search." : "No articles published yet."}
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

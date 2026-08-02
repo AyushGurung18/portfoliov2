@@ -11,7 +11,7 @@ import {
 } from "framer-motion";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
-import { FiRefreshCw } from "react-icons/fi";
+import { Search, RefreshCw } from "lucide-react";
 import BeautifulError from "@/components/BeautifulError";
 import Image from "next/image";
 
@@ -98,129 +98,146 @@ const Projects = () => {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="bg-black text-white p-7 my-12 flex justify-center items-center min-h-[400px]">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
   return (
-    <motion.div
-      className="bg-black text-white p-7 my-12"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="py-12 my-12 mb-8">
-        <h1 className="sm:text-7xl text-5xl tracking-tighter font-bold">Projects</h1>
-        <br />
-        <p className="text-sm sm:text-base tracking-tighter">
-          I love building projects and practicing my engineering skills. Here&apos;s an archive of things that I&apos;ve worked on.
-        </p>
-        <div className="flex items-center mt-4 justify-between">
-          <input
-            type="text"
-            placeholder="Search Projects"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-2 bg-[#1E2029] w-96 text-white border border-[#3CCF91] rounded"
-          />
-          <motion.div className="ms-8 flex justify-end" style={{ rotate: rotation }}>
-            <FiRefreshCw
-              className="cursor-pointer text-[#3CCF91] hover:text-[#2ba577] transition-colors"
-              size={20}
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-6xl mx-auto px-6 pt-28 pb-8 md:pt-36">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="text-sm font-medium tracking-wide text-[#3CCF91] mb-3">Portfolio</p>
+          <h1 className="font-serif text-5xl sm:text-6xl font-bold tracking-tight mb-5">
+            Projects
+          </h1>
+          <p className="text-lg text-gray-400 leading-relaxed max-w-xl">
+            I love building projects and practicing my engineering skills. Here&apos;s an archive of things that I&apos;ve worked on.
+          </p>
+
+          <div className="flex items-center gap-3 mt-8 max-w-xl">
+            <div className="relative flex-1">
+              <Search
+                size={16}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+              />
+              <input
+                type="text"
+                placeholder="Search projects"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-full border border-white/10 bg-white/[0.04] py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-gray-500 outline-none transition-colors focus:border-[#3CCF91]/60 focus:bg-white/[0.06]"
+              />
+            </div>
+            <motion.button
+              type="button"
               onClick={handleRefresh}
-            />
-          </motion.div>
-        </div>
+              aria-label="Refresh projects"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-gray-400 transition-colors hover:border-[#3CCF91]/60 hover:text-[#3CCF91]"
+              style={{ rotate: rotation }}
+            >
+              <RefreshCw size={16} />
+            </motion.button>
+          </div>
+        </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <AnimatePresence>
-          {filteredProjects.length > 0 ? (
-            filteredProjects.map((project, index) => {
-              // Generate clean slug without ID
-              
-              return (
-              <Link key={project.slug} href={`/projects/${project.slug}`} prefetch>
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 30 }}
-                    transition={{ delay: index * 0.1, duration: 1 }}
-                    className="bg-black pb-4 border border-[#1E2029] tracking-tighter rounded-lg shadow-lg flex flex-col h-full cursor-pointer hover:border-[#3CCF91] transition-colors duration-300"
-                  >
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-auto object-cover rounded-lg mb-4"
-                      width={600}
-                      height={400}
-                      priority={index === 0}
-                    />
-                    <div className="px-4 flex flex-col flex-grow">
-                      <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-white">{project.title}</h3>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.technologies.map((tech, techIndex) => {
-                          const techInfo = techStack[tech];
-                          if (!techInfo) {
-                            // Fallback for technologies not in techStack
+      <div className="max-w-6xl mx-auto px-6 pb-24">
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[300px]">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatePresence>
+              {filteredProjects.length > 0 ? (
+                filteredProjects.map((project, index) => (
+                  <Link key={project.slug} href={`/projects/${project.slug}`} prefetch>
+                    <motion.div
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 24 }}
+                      transition={{ delay: Math.min(index * 0.06, 0.3), duration: 0.5 }}
+                      whileHover={{ y: -4 }}
+                      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] shadow-lg shadow-black/20 transition-colors duration-300 hover:border-[#3CCF91]/50"
+                    >
+                      <div className="relative w-full aspect-video overflow-hidden bg-white/[0.03]">
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                          priority={index === 0}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                      </div>
+
+                      <div className="flex flex-1 flex-col p-5">
+                        <h3 className="text-xl font-semibold text-white mb-2 transition-colors group-hover:text-[#3CCF91]">
+                          {project.title}
+                        </h3>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {project.technologies.map((tech, techIndex) => {
+                            const techInfo = techStack[tech];
+                            if (!techInfo) {
+                              return (
+                                <span
+                                  key={techIndex}
+                                  className="px-2.5 py-1 text-xs rounded-full bg-white/[0.06] text-gray-300 border border-white/10"
+                                >
+                                  {tech}
+                                </span>
+                              );
+                            }
                             return (
                               <span
                                 key={techIndex}
-                                className="px-3 py-1 text-sm rounded-full bg-gray-800 text-gray-300 border border-gray-600"
+                                className="px-2.5 py-1 text-xs rounded-full flex items-center gap-1"
+                                style={{
+                                  backgroundColor: `${techInfo.color}15`,
+                                  color: techInfo.text_color,
+                                  border: `1px solid ${techInfo.color}`,
+                                }}
                               >
+                                <i className={`icon-${techInfo.icon} text-sm`}></i>
                                 {tech}
                               </span>
                             );
-                          }
-                          return (
-                            <span
-                              key={techIndex}
-                              className="px-3 py-1 text-sm rounded-full flex items-center gap-1"
-                              style={{
-                                backgroundColor: `${techInfo.color}15`,
-                                color: techInfo.text_color,
-                                border: `1px solid ${techInfo.color}`,
-                              }}
-                            >
-                              <i className={`icon-${techInfo.icon} text-base`}></i>
-                              {tech}
-                            </span>
-                          );
-                        })}
-                      </div>
-                      <hr className="border-t border-[#1E2029] mb-4" />
-                      <div className="flex flex-col flex-grow">
-                        <p className="text-[#869094] text-sm sm:text-base">{project.description}</p>
-                        <div className="mt-auto pt-4">
-                          <a
-                            href={project.github || "https://github.com"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex space-x-2 w-auto px-6 py-2 text-base font-semibold text-white bg-[#141414] rounded hover:bg-[#292929] cursor-pointer transition-colors"
-                            onClick={(e) => e.stopPropagation()} // Prevent Link navigation when clicking GitHub link
+                          })}
+                        </div>
+
+                        <p className="text-sm text-gray-400 leading-relaxed flex-1">
+                          {project.description}
+                        </p>
+
+                        <div className="mt-5 pt-4 border-t border-white/10">
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-[#3CCF91]/60 hover:text-[#3CCF91]"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(project.github || "https://github.com", "_blank", "noopener,noreferrer");
+                            }}
                           >
-                            <FaGithub size={20} />
-                            <span>View Source</span>
-                          </a>
+                            <FaGithub size={16} />
+                            View Source
+                          </button>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                </Link>
-              );
-            })
-          ) : (
-            <div className="col-span-full text-center py-12 text-[#7f8b97]">
-              {searchTerm ? "No projects found matching your search." : "No projects available."}
-            </div>
-          )}
-        </AnimatePresence>
+                    </motion.div>
+                  </Link>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-24 text-gray-500">
+                  {searchTerm ? "No projects found matching your search." : "No projects available."}
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

@@ -9,6 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { FaGithub } from 'react-icons/fa';
 import BeautifulError from '@/components/BeautifulError';
 import Image from 'next/image';
+import ReadingProgressBar from '@/components/ReadingProgressBar';
+import { ArrowLeft, ExternalLink, MessageCircle } from 'lucide-react';
 
 interface ContentSection {
   id: string;
@@ -112,24 +114,34 @@ export default function ProjectDetailsPage({ slug, initialData }: Props) {
   const renderSectionContent = (content: string | string[] | undefined) => {
     if (!content) return null;
     return Array.isArray(content) ? (
-      <ul className="list-disc pl-5 text-gray-300">
+      <ul className="list-disc marker:text-[#3CCF91] pl-5 space-y-2.5 text-[1.05rem] leading-[1.85] text-gray-300">
         {content.map((item, idx) => (
-          <li key={idx} className="mb-2">{item}</li>
+          <li key={idx}>{item}</li>
         ))}
       </ul>
     ) : (
-      <div className="text-gray-300 whitespace-pre-line">{content}</div>
+      <p className="whitespace-pre-line text-[1.05rem] leading-[1.85] text-gray-300">
+        {content}
+      </p>
     );
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white py-12">
-        <Skeleton className="h-6 w-32 bg-gray-800 mb-8" />
-        <Skeleton className="w-full h-64 md:h-80 rounded-xl mb-10 bg-gray-800" />
-        <div className="flex items-center gap-3 mb-10">
-          <Skeleton className="w-1 h-8 rounded bg-gray-800" />
-          <Skeleton className="h-10 w-3/4 max-w-md bg-gray-800" />
+      <div className="min-h-screen bg-black text-white">
+        <div className="max-w-3xl mx-auto px-6 pt-28 pb-8 md:pt-36">
+          <Skeleton className="h-4 w-28 mb-10" />
+          <Skeleton className="h-11 w-full max-w-lg mb-3" />
+          <Skeleton className="h-11 w-2/3 max-w-sm mb-6" />
+          <Skeleton className="h-5 w-full max-w-md mb-8" />
+          <div className="flex gap-2 pb-8 border-b border-white/10">
+            <Skeleton className="h-7 w-20 rounded-full" />
+            <Skeleton className="h-7 w-24 rounded-full" />
+            <Skeleton className="h-7 w-16 rounded-full" />
+          </div>
+        </div>
+        <div className="max-w-4xl mx-auto px-6 mt-10">
+          <Skeleton className="w-full h-64 md:h-96 rounded-2xl" />
         </div>
       </div>
     );
@@ -150,75 +162,129 @@ export default function ProjectDetailsPage({ slug, initialData }: Props) {
   if (!project) return null;
 
   return (
-    <div className="min-h-screen bg-black text-white py-12">
-      <div className="border-b border-gray-800 pb-8">
-        <Link href="/projects" className="text-blue-400 hover:underline mb-8 inline-block">
-          ← Back to Projects
-        </Link>
-
-        <Image
-          src={project.image}
-          alt={project.title}
-          width={1200}
-          height={600}
-          className="w-full rounded-xl mb-10 shadow-xl"
-          priority
-        />
-
-        <h1 className="sm:text-4xl text-3xl my-3 font-extrabold">{project.title}</h1>
-        <p className="my-2 text-sm sm:text-base text-gray-400">{project.description}</p>
-
-        {project.project_url && (
-          <Link href={project.project_url} target="_blank" className="text-green-400 flex items-center gap-2 text-sm hover:underline">
-            <FaGithub /> Live Site
+    <>
+      <ReadingProgressBar />
+      <article className="min-h-screen bg-black text-white">
+        <div className="max-w-3xl mx-auto px-6 pt-28 pb-8 md:pt-36">
+          <Link
+            href="/projects"
+            className="group inline-flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-[#3CCF91] mb-10"
+          >
+            <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-0.5" />
+            Back to Projects
           </Link>
-        )}
-      </div>
 
-      <div className="flex flex-col md:flex-row gap-12 mt-10">
-        <div className="flex-1">
-          {project.content_sections?.map((section, index) => (
-            <section
-              key={index}
-              id={section.id}
-              ref={(el) => { sectionRefs.current[section.title] = el; }}
-              className="mb-12 scroll-mt-48"
-            >
-              <h2 className="sm:text-3xl text-2xl font-bold mb-4 flex items-center gap-3">
-                <span className="w-1 h-8 bg-green-500 block rounded"></span>
-                {section.title}
-              </h2>
-              {renderSectionContent(section.content)}
-            </section>
-          ))}
+          <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-[1.15] tracking-tight text-white mb-5">
+            {project.title}
+          </h1>
+
+          {project.description && (
+            <p className="text-lg sm:text-xl text-gray-400 leading-relaxed font-light mb-8">
+              {project.description}
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-3 pb-8 border-b border-white/10">
+            {project.technologies?.map((tech, idx) => (
+              <span
+                key={idx}
+                className="px-3 py-1 text-xs font-medium rounded-full bg-white/[0.06] text-gray-300 border border-white/10"
+              >
+                {tech}
+              </span>
+            ))}
+
+            <div className="ml-auto flex items-center gap-2">
+              {project.project_url && (
+                <Link
+                  href={project.project_url}
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#3CCF91] px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-[#2ba577]"
+                >
+                  <ExternalLink size={14} />
+                  Live Site
+                </Link>
+              )}
+              {project.github && (
+                <Link
+                  href={project.github}
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-[#3CCF91]/60 hover:text-[#3CCF91]"
+                >
+                  <FaGithub size={14} />
+                  Source
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
 
-        <aside className="w-full md:w-64 flex-shrink-0 sticky top-32 self-start hidden md:block">
-          <h3 className="text-xl font-bold mb-4">Table of Contents</h3>
-          <ul className="space-y-2">
-            {project.content_sections.map((section, index) => (
-              <li key={index}>
-                <a
-                  href={`#${section.id}`}
-                  onClick={(e) => scrollToSection(e, section.id)}
-                  className={clsx(
-                    "hover:text-green-400 text-sm block transition",
-                    activeSection === section.title
-                      ? "text-green-500 font-semibold"
-                      : "text-gray-400"
-                  )}
-                >
-                  {section.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      </div>
+        {project.image && (
+          <div className="max-w-4xl mx-auto px-6 mt-10 mb-4">
+            <Image
+              src={project.image}
+              alt={project.title}
+              width={1400}
+              height={700}
+              className="w-full rounded-2xl border border-white/10 shadow-2xl shadow-black/40 object-cover"
+              priority
+            />
+          </div>
+        )}
 
-      <div className="space-y-8 mt-16">
-        <TextareaForm page={`project/${slug}`} />
-      </div>
-    </div>
+        <div className="max-w-3xl mx-auto px-6 py-10 flex gap-12">
+          <div className="min-w-0 flex-1">
+            {project.content_sections?.map((section, index) => (
+              <section
+                key={index}
+                id={section.id}
+                ref={(el) => { sectionRefs.current[section.title] = el; }}
+                className="mb-12 scroll-mt-32"
+              >
+                <h2 className="flex items-center gap-2.5 text-2xl sm:text-3xl font-bold text-white mb-5">
+                  <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-[#3CCF91]" />
+                  {section.title}
+                </h2>
+                {renderSectionContent(section.content)}
+              </section>
+            ))}
+          </div>
+
+          <aside className="hidden lg:block w-56 flex-shrink-0">
+            <div className="sticky top-32">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
+                On this page
+              </p>
+              <ul className="space-y-1 border-l border-white/10">
+                {project.content_sections?.map((section, index) => (
+                  <li key={index}>
+                    <a
+                      href={`#${section.id}`}
+                      onClick={(e) => scrollToSection(e, section.id)}
+                      className={clsx(
+                        "-ml-px block border-l-2 pl-4 py-1.5 text-sm transition-colors",
+                        activeSection === section.title
+                          ? "border-[#3CCF91] text-[#3CCF91] font-medium"
+                          : "border-transparent text-gray-500 hover:text-gray-300"
+                      )}
+                    >
+                      {section.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+        </div>
+
+        <div className="max-w-3xl mx-auto px-6 pb-24 pt-10 border-t border-white/10">
+          <div className="flex items-center gap-2 mb-8">
+            <MessageCircle size={18} className="text-[#3CCF91]" />
+            <h3 className="text-lg font-semibold">Discussion</h3>
+          </div>
+          <TextareaForm page={`project/${slug}`} />
+        </div>
+      </article>
+    </>
   );
 }

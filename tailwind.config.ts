@@ -37,6 +37,14 @@ export default {
 				'"Segoe UI Emoji"',
 				'"Segoe UI Symbol"'
 			],
+			serif: [
+				'var(--font-source-serif)',
+				'Georgia',
+				'Cambria',
+				'"Times New Roman"',
+				'Times',
+				'serif',
+			],
 		},
   		colors: {
   			background: 'hsl(var(--background))',
