@@ -241,8 +241,7 @@ export default function ProjectDetailsPage({ slug, initialData }: Props) {
                 ref={(el) => { sectionRefs.current[section.title] = el; }}
                 className="mb-12 scroll-mt-32"
               >
-                <h2 className="flex items-center gap-2.5 text-2xl sm:text-3xl font-bold text-white mb-5">
-                  <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-[#3CCF91]" />
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-5">
                   {section.title}
                 </h2>
                 {renderSectionContent(section.content)}
