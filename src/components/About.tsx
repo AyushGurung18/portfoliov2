@@ -34,7 +34,7 @@ const About = () => {
             <p>
               My flagship project,{" "}
               <Tooltip
-                text="bbygrl / thotqen"
+                text="Folio — Legal Contract Analysis"
                 tooltipText="A full-stack AI Knowledge Copilot: React 19 frontend with GSAP canvas animations, FastAPI backend, LangChain RAG orchestration, pgvector semantic search, and a Cloudflare edge gateway."
               />{" "}
               , is a production-grade{" "}
